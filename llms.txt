@@ -1,0 +1,59 @@
+# pgBelayCrew
+
+> A control plane for PostgreSQL backups — measurable, repeatable, auditable. An operational layer around wal-g (scheduling, verification, audit) that turns untested runbooks into restores you can prove. Open source, AGPL v3.
+
+This site is the landing page for the pgBelayCrew project. It is not the product itself — the product is a console + agents that operate alongside an existing PostgreSQL deployment and S3-compatible storage. The page exists to explain what the project is, who it is for, and how to try it.
+
+The project's positioning is deliberately narrow: it does not replace wal-g, it wraps it. wal-g performs the backup/restore work; pgBelayCrew adds the operator-facing control plane (scheduling, verification, compliance evidence, audit log) that wal-g intentionally does not provide.
+
+## What the project is
+
+- Control plane for PostgreSQL backups built on top of wal-g.
+- Three components: a Console (operator UI), an Agent (one per PostgreSQL host, stateless wal-g wrapper), and S3-compatible storage. Console ↔ Agent over gRPC mTLS; Agent ↔ Storage over the S3 API.
+- Four primitives organize the operator's day: Cluster, Backup, Restore point, Restore run.
+- Restore points come at four paranoia levels: light, enough, safe, paranoid.
+- Restore runs expose four intents: sandbox, recover-data, restore-cluster, emergency. Destructive paths require dual approval.
+- Verifications run at four levels (L1–L4): checksum, sandbox + assertions, regression suite, multi-cluster. Triggered on cron or after every full backup. Each emits a signed attestation.
+- Configuration advisor with 15 rules sourced from official PostgreSQL and wal-g docs. Each finding includes severity, impact, and the exact `ALTER SYSTEM` to fix it.
+- Hash-chained audit log; every action appended and verifiable, exportable as a signed bundle.
+- Compliance dashboard: 31 controls across SOC 2, ISO/IEC 27001, HIPAA, GDPR, and PCI DSS, evaluated by real DB queries, with a gap register, waiver workflow, 90-day trend, and signed audit bundle.
+
+## License and stance
+
+- AGPL v3 — chosen on purpose, not as a default.
+- Maintainer's stated stance: open source as a defense against enshittification of closed services; users must always be able to take the code and run their own version.
+- Four tenets in the manifesto: open beats closed for new ideas; open source is a habit (every change in public), not a checkbox; money is fuel, not the goal; open source is a gift, not an invoice.
+
+## Quickstart (as advertised on the page)
+
+The repository ships a Docker stack — real PostgreSQL, real MinIO, real Dex (OIDC), real agents — exercising every code path end-to-end:
+
+```
+./scripts/bootstrap.sh        # dev PKI + .env
+docker compose up -d          # PG + MinIO + Dex + console + agents
+./scripts/enroll-agents.sh    # mint tokens, attach 3 agents
+./scripts/smoke.sh            # 17 end-to-end scenarios
+open http://localhost         # sign in: admin / admin
+```
+
+## Page sections
+
+- [Hero](index.html#hero): tagline, license badge, screenshot carousel of the console (dashboard, cluster overview, restore points, verifications, configuration advisor, compliance, audit).
+- [Problem](index.html#problem): four problems addressed — restoring is stressful, backups are never tested, compliance is opaque, RTO/RPO are theoretical.
+- [Features](index.html#features): four primitives (Cluster, Backup, Restore point, Restore run) plus surrounding capabilities (verifications, configuration advisor, S3 backends, hash-chained audit log).
+- [Architecture](index.html#architecture): three roles only — Console, Agent (×N), S3-compatible storage.
+- [Compliance](index.html#compliance): SOC 2, ISO 27001, HIPAA, GDPR, PCI DSS.
+- [Quickstart](index.html#quickstart): five-minute Docker stack.
+- [Credit](index.html#credit): explicit acknowledgment that wal-g (https://github.com/wal-g/wal-g) does the hard part.
+- [Manifesto](index.html#manifesto): the maintainer's note on open source and AGPL v3.
+
+## Files on this site
+
+- [index.html](index.html): the full landing page (single-page, all sections inline).
+- [styles.css](styles.css): styling.
+- [script.js](script.js): carousel, animated constellation backdrop, minor interactivity.
+- [screens/](screens/): screenshots of the actual console used in the hero carousel.
+
+## Upstream
+
+- wal-g: https://github.com/wal-g/wal-g — the engine pgBelayCrew wraps. Backups are wal-g backups; restores are wal-g restores.
