@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pgBelayCrew — Documentation</title>
+    <meta
+      name="description"
+      content="Operator documentation for pgBelayCrew — install, configure, run, troubleshoot, and build a control plane for PostgreSQL backups."
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff5544' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2 C7 2 4 5 4 11 L4 18 C4 20 6 22 8 22 L16 22 C18 22 20 20 20 18 L20 14'/><path d='M16 8 L20 8'/></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="docs.css" />
+  </head>
+  <body>
+    <canvas id="constellation" class="constellation" aria-hidden="true"></canvas>
+
+    <!-- ============================================================ -->
+    <!-- TOPBAR -->
+    <!-- ============================================================ -->
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="pgBelayCrew">
+        <span class="brand-logo" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2 C7 2 4 5 4 11 L4 18 C4 20 6 22 8 22 L16 22 C18 22 20 20 20 18 L20 14" />
+            <path d="M16 8 L20 8" />
+          </svg>
+        </span>
+        <span class="brand-name">
+          <span class="brand-pg">pg</span><span class="brand-rest">Belay<span class="crew">Crew</span></span>
+        </span>
+      </a>
+
+      <nav class="topnav" aria-label="Primary">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#architecture">Architecture</a>
+        <a href="index.html#quickstart">Quickstart</a>
+        <a href="docs.html" aria-current="page">Docs</a>
+      </nav>
+
+      <div class="topbar-spacer"></div>
+
+      <span class="signal" aria-label="License">
+        <span class="signal-dot"></span>
+        <span class="signal-text">AGPL v3</span>
+      </span>
+      <a class="btn btn-secondary btn-sm" href="https://github.com/pgbelaycrew/pgbelaycrew" rel="noopener">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.6-4-1.6a3.1 3.1 0 0 0-1.3-1.7c-1.1-.7.1-.7.1-.7a2.4 2.4 0 0 1 1.8 1.2 2.5 2.5 0 0 0 3.4 1 2.5 2.5 0 0 1 .7-1.6c-2.6-.3-5.4-1.3-5.4-5.9a4.6 4.6 0 0 1 1.2-3.2 4.3 4.3 0 0 1 .1-3.2s1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2a4.3 4.3 0 0 1 .1 3.2 4.6 4.6 0 0 1 1.2 3.2c0 4.6-2.8 5.6-5.5 5.9a2.8 2.8 0 0 1 .8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        <span>GitHub</span>
+      </a>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- DOCS HERO -->
+    <!-- ============================================================ -->
+    <section class="docs-hero">
+      <div class="container">
+        <div class="docs-hero-inner">
+          <span class="kicker">Documentation</span>
+          <h1 class="heading">Run pgBelayCrew in production.</h1>
+          <p>
+            Everything an operator needs — from a five-minute evaluation stack to a
+            hardened multi-cluster deployment. Install the three components, configure
+            the security boundary, learn the operator's day, and find the fix when
+            something breaks.
+          </p>
+          <div class="doc-jump">
+            <a class="doc-chip" href="#install"><span class="num">01</span> Install</a>
+            <a class="doc-chip" href="#configure"><span class="num">02</span> Configure</a>
+            <a class="doc-chip" href="#guide"><span class="num">03</span> User guide</a>
+            <a class="doc-chip" href="#trouble"><span class="num">04</span> Troubleshooting</a>
+            <a class="doc-chip" href="#build"><span class="num">05</span> Build</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mobile TOC toggle -->
+    <div class="docs-mobile-bar" id="tocToggle" role="button" tabindex="0" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <span>On this page</span>
+    </div>
+
+    <main class="docs-main">
+      <div class="container">
+        <div class="docs-layout">
+          <!-- ======================================================= -->
+          <!-- SIDEBAR TOC -->
+          <!-- ======================================================= -->
+          <aside class="docs-sidebar" id="docsSidebar" aria-label="Documentation contents">
+            <div class="docs-nav-group">
+              <div class="docs-nav-title"><span class="gnum">01</span> Install</div>
+              <ul class="docs-nav">
+                <li><a href="#install">Overview &amp; quick start</a></li>
+                <li><a href="#install-console">Console install</a></li>
+                <li><a href="#install-ui">UI install</a></li>
+                <li><a href="#install-agent">Agent install</a></li>
+                <li><a href="#install-checklist">Post-install checklist</a></li>
+              </ul>
+            </div>
+            <div class="docs-nav-group">
+              <div class="docs-nav-title"><span class="gnum">02</span> Configure</div>
+              <ul class="docs-nav">
+                <li><a href="#configure">What lives where</a></li>
+                <li><a href="#configure-console">Console (env vars)</a></li>
+                <li><a href="#configure-masterkey">Master key (sealed)</a></li>
+                <li><a href="#configure-ui">UI</a></li>
+                <li><a href="#configure-agent">Agent (TOML)</a></li>
+              </ul>
+            </div>
+            <div class="docs-nav-group">
+              <div class="docs-nav-title"><span class="gnum">03</span> User guide</div>
+              <ul class="docs-nav">
+                <li><a href="#guide">UI &amp; roles</a></li>
+                <li><a href="#guide-cluster">1 · Cluster</a></li>
+                <li><a href="#guide-backup">2 · Backup</a></li>
+                <li><a href="#guide-restore-point">3 · Restore point</a></li>
+                <li><a href="#guide-restore">4 · Restore</a></li>
+                <li><a href="#guide-verifications">5 · Verifications</a></li>
+                <li><a href="#guide-advisor">6 · Advisor</a></li>
+                <li><a href="#guide-audit">7 · Audit log</a></li>
+                <li><a href="#guide-compliance">8 · Compliance</a></li>
+                <li><a href="#guide-rhythm">9 · Day-to-day rhythm</a></li>
+              </ul>
+            </div>
+            <div class="docs-nav-group">
+              <div class="docs-nav-title"><span class="gnum">04</span> Troubleshooting</div>
+              <ul class="docs-nav">
+                <li><a href="#trouble">Agent offline</a></li>
+                <li><a href="#trouble-cert">Cert revoked / expired</a></li>
+                <li><a href="#trouble-backup">Backups failing</a></li>
+                <li><a href="#trouble-restore">Restore won't proceed</a></li>
+                <li><a href="#trouble-db">Console DB down</a></li>
+                <li><a href="#trouble-masterkey">Master key lifecycle</a></li>
+                <li><a href="#trouble-walg">wal-g mismatch</a></li>
+                <li><a href="#trouble-audit">Audit chain broken</a></li>
+                <li><a href="#trouble-ui">Common UI symptoms</a></li>
+              </ul>
+            </div>
+            <div class="docs-nav-group">
+              <div class="docs-nav-title"><span class="gnum">05</span> Build</div>
+              <ul class="docs-nav">
+                <li><a href="#build">Why two artifact types</a></li>
+                <li><a href="#build-packages">Agent packages</a></li>
+                <li><a href="#build-images">Container images</a></li>
+                <li><a href="#build-aggregates">Aggregates</a></li>
+                <li><a href="#build-repro">Reproducibility</a></li>
+              </ul>
+            </div>
+          </aside>
+
+          <!-- ======================================================= -->
+          <!-- CONTENT -->
+          <!-- ======================================================= -->
+          <div class="docs-content prose">
+
+            <!-- ===================================================== -->
+            <!-- 01 · INSTALL -->
+            <!-- ===================================================== -->
+            <section class="doc-section" id="install">
+              <span class="doc-section-kicker">01 · Install guide</span>
+              <h2>Standing pgBelayCrew up on real infrastructure</h2>
+              <p class="doc-lede">
+                For <strong>operators</strong> deploying on real infrastructure. The install paths
+                differ per component:
+              </p>
+              <ul>
+                <li><strong>Console</strong> — one deployment per organization. Container image (Docker, Kubernetes/Helm).</li>
+                <li><strong>Agent</strong> — one per PostgreSQL host. Native OS package (<code>.deb</code> / <code>.rpm</code> / <code>.apk</code> / <code>.pkg.tar.zst</code>) or container.</li>
+                <li><strong>UI</strong> — separate container, served behind the same origin as the console via your reverse proxy.</li>
+              </ul>
+              <p>
+                If you only want to evaluate the product, <strong>start with the validation
+                harness</strong> below — it deploys all three components on one host with a single
+                <code>docker compose up</code>. Once you've seen it work end-to-end, come back for
+                the per-component install.
+              </p>
+              <div class="doc-note warn">
+                <span class="doc-note-label">Where the agent runs</span>
+                <p>
+                  The agent runs <strong>on the PostgreSQL host</strong>, not in your Kubernetes
+                  cluster. It needs filesystem reach to <code>PGDATA</code>, the WAL archive, and the
+                  Postgres Unix socket — that's a host concern, not a pod concern. The console and UI
+                  are happy in Kubernetes; the agent is not.
+                </p>
+              </div>
+
+              <h3 id="install-quickstart">Quick start — validation harness</h3>
+              <p>
+                The fastest way to see pgBelayCrew running. It spins up two real PostgreSQL clusters
+                (single-node and primary&nbsp;+&nbsp;standby), real MinIO for backup storage, real
+                Dex for OIDC, and three real agents — same code paths as production.
+              </p>
+              <p><strong>Requirements:</strong> Docker&nbsp;≥&nbsp;24, Docker Compose&nbsp;v2, ~6&nbsp;GB RAM available to Docker.</p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">validation</span></div>
+                <pre><code><span class="pr">cd</span> validation
+<span class="pr">./scripts/bootstrap.sh</span>        <span class="cmt"># generates dev PKI + .env</span>
+<span class="pr">docker compose up -d</span>          <span class="cmt"># PG + MinIO + Dex + console + UI + agents</span>
+<span class="pr">./scripts/enroll-agents.sh</span>    <span class="cmt"># mints enrollment tokens, attaches the 3 agents</span>
+<span class="pr">./scripts/smoke.sh</span>            <span class="cmt"># runs the smoke scenarios</span></code></pre>
+              </div>
+              <p>
+                Open <a href="http://localhost" rel="noopener">http://localhost</a> and sign in via
+                Dex with <code>admin</code> / <code>admin</code>. To wipe everything:
+                <code>./scripts/reset.sh</code>.
+              </p>
+              <div class="doc-note danger">
+                <span class="doc-note-label">Workstation only</span>
+                <p>
+                  The harness ships <strong>dev-only secrets in plain text</strong> and binds
+                  Dex/MinIO consoles on loopback. It is safe on a workstation, not safe on a shared
+                  host. <strong>Never expose any of its ports beyond <code>127.0.0.1</code>.</strong>
+                </p>
+              </div>
+            </section>
+
+            <section class="doc-section" id="install-console">
+              <h2>1 · Console install</h2>
+              <p class="doc-lede">
+                The console is the central control plane. One deployment serves all clusters and all
+                human operators.
+              </p>
+
+              <h3>What you need first</h3>
+              <ul>
+                <li>A <strong>PostgreSQL 14+ instance</strong> for the console's own state DB (separate from the clusters you manage).</li>
+                <li>An <strong>OIDC provider</strong> (Keycloak, Okta, Azure AD, Dex, …) — there is no local user DB. The console authenticates humans only via OIDC.</li>
+                <li>An <strong>S3-compatible storage backend</strong> for backups (AWS S3, Scaleway, OVHcloud, MinIO, R2…). Configured <strong>per cluster, in the UI</strong>, not at install time.</li>
+                <li>A <strong>reverse proxy / ingress</strong> that terminates TLS and routes the same origin to the UI container (port 3000) and the console's <code>/api/</code>, <code>/api/v1/healthz</code>, <code>/pki/</code> (port 8080).</li>
+                <li>A <strong>PKI</strong> for the agent&nbsp;↔&nbsp;console mTLS plane. The console CA signs agent certs at enrollment time.</li>
+                <li><strong>NTP-synchronised clocks</strong> on every host to within ±5 minutes — mTLS and the audit hash chain are unforgiving here. <code>chrony</code> recommended.</li>
+                <li>A <strong>secrets store</strong> for <code>PGBC_SESSION_SECRET</code> and the OIDC client secret; the unseal password lives <strong>outside</strong> any of these.</li>
+              </ul>
+
+              <h3>Option A — Container (single host, Docker Compose)</h3>
+              <p>
+                The minimal production-ish topology runs three containers (UI, console,
+                console-state-Postgres) plus your reverse proxy. A ready-to-adapt compose file ships
+                at <code>docker-compose.prod.yml</code> — it wires the five services together (UI,
+                console, console-state-Postgres, one-shot schema migrator, HAProxy), pulls every
+                image from <code>ghcr.io/pgbelaycrew/pgbc-*:stable</code>, terminates TLS at HAProxy
+                with hardened cipher suites and HSTS, and routes <code>/api</code>, <code>/pki</code>
+                to the console while everything else goes to the UI on the same origin.
+              </p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code><span class="cmt"># Fetch just what you need — no clone required.</span>
+mkdir -p pgbelaycrew/{certs,haproxy} &amp;&amp; cd pgbelaycrew
+curl -fsSLO https://raw.githubusercontent.com/&lt;owner&gt;/pgbelaycrew/&lt;tag&gt;/docs/docker-compose.prod.yml
+curl -fsSL  https://raw.githubusercontent.com/&lt;owner&gt;/pgbelaycrew/&lt;tag&gt;/docs/haproxy/haproxy.cfg \
+    -o haproxy/haproxy.cfg
+
+<span class="cmt"># pgbelaycrew.env: mode 0600, see header of docker-compose.prod.yml</span>
+<span class="cmt"># certs/pgbelaycrew.pem: full chain + private key, mode 0600</span>
+docker compose -f docker-compose.prod.yml --env-file pgbelaycrew.env up -d</code></pre>
+              </div>
+              <p>
+                Prefer assembling your own compose / k8s manifests? Pull the images and compose the
+                console up with the <strong>mandatory production env vars</strong>:
+              </p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">docker-compose.yml</span></div>
+                <pre><code>services:
+  console:
+    image: ghcr.io/pgbelaycrew/console:&lt;tag&gt;
+    environment:
+      PGBC_ENV: production
+      DATABASE_URL: postgres://pgbc:***@console-pg:5432/pgbelaycrew?sslmode=require
+      PGBC_SESSION_SECRET: ${PGBC_SESSION_SECRET}     <span class="cmt"># ≥ 32 random bytes</span>
+      <span class="cmt"># No PGBC_MASTER_KEY — generated on first boot, wrapped under</span>
+      <span class="cmt"># an operator-supplied unseal password (see First-boot below).</span>
+      PGBC_OIDC_ISSUER:        https://idp.example.com
+      PGBC_OIDC_CLIENT_ID:     pgbelaycrew-console
+      PGBC_OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      PGBC_OIDC_REDIRECT_URL:  https://pgbelaycrew.example.com/api/v1/auth/callback
+      PGBC_UI_BASE_URL:        https://pgbelaycrew.example.com
+      PGBC_BOOTSTRAP_ADMIN_EMAIL: ops-lead@example.com  <span class="cmt"># first verified login → admin</span>
+    ports:
+      - "127.0.0.1:8080:8080"   <span class="cmt"># HTTP (proxy-fronted)</span>
+      - "9090:9090"             <span class="cmt"># gRPC, exposed to agents over the network</span>
+      - "127.0.0.1:9091:9091"   <span class="cmt"># Prometheus metrics</span></code></pre>
+              </div>
+              <p>
+                Run database migrations <strong>once</strong> before starting the console for the
+                first time. Migrations ship in a dedicated one-shot image
+                (<code>pgbc-console-migrate</code>) that bundles <code>goose</code> (schema) and
+                <code>river</code> (queue) — the console refuses to start against a stale schema.
+                Re-run on every release that ships migrations:
+              </p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code>docker run --rm \
+  -e DATABASE_URL=postgres://pgbc:***@console-pg:5432/pgbelaycrew?sslmode=require \
+  -e GOOSE_DRIVER=postgres \
+  -e GOOSE_DBSTRING=postgres://pgbc:***@console-pg:5432/pgbelaycrew?sslmode=require \
+  -e GOOSE_MIGRATION_DIR=/migrations \
+  --entrypoint /bin/sh \
+  ghcr.io/pgbelaycrew/pgbc-console-migrate:&lt;tag&gt; \
+  -c 'goose up &amp;&amp; river migrate-up --database-url "$DATABASE_URL"'</code></pre>
+              </div>
+              <p>Verify the HTTP plane is up:</p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code>curl -s https://pgbelaycrew.example.com/api/v1/healthz       <span class="cmt"># {"status":"ok"}</span>
+curl -s https://pgbelaycrew.example.com/api/v1/version
+curl -s https://pgbelaycrew.example.com/api/v1/seal/status   <span class="cmt"># {"state":"uninitialized",...}</span></code></pre>
+              </div>
+
+              <h3 id="install-firstboot">First-boot Init / Unseal</h3>
+              <p>
+                A fresh deployment starts with <strong>no master key</strong> in memory or on disk.
+                Encrypted-data routes return <code>503 + X-Pgbc-Sealed: true</code> until an admin
+                completes the seal flow through the UI:
+              </p>
+              <ol>
+                <li>Sign in via OIDC. <strong>Set <code>PGBC_BOOTSTRAP_ADMIN_EMAIL</code> first</strong>: the first user to sign in becomes global admin only if their email matches it and the IdP marked the address verified — otherwise they land as a <code>viewer</code> and nobody can complete the seal flow. Fail-closed when unset.</li>
+                <li>The SealOverlay renders automatically. On the first boot it shows <strong>"Initialise master password"</strong> — choose a password (twice) and submit. The console generates a 32-byte master key, wraps it under an Argon2id-derived KEK, and stores the wrapped row as <code>master_keys</code> v1.</li>
+                <li>On every <strong>subsequent restart</strong> the overlay shows <strong>"Console is sealed"</strong> instead — type the same password to unseal.</li>
+              </ol>
+              <p>
+                In both cases the CA, signing key, and agent gRPC plane lazy-load in the same process
+                the moment Init/Unseal succeeds — no console restart needed.
+              </p>
+              <div class="doc-note danger">
+                <span class="doc-note-label">No recovery</span>
+                <p>
+                  <strong>Save the password in your corporate password manager.</strong> There is no
+                  recovery: every wrapped blob (storage credentials, webhook HMACs, internal CA,
+                  signing keys) becomes unreadable if it is lost. See
+                  <a href="#configure-masterkey">Master key (sealed)</a> for the full lifecycle.
+                </p>
+              </div>
+
+              <h3>Option B — Kubernetes (Helm)</h3>
+              <p>
+                A starter chart ships at <code>modules/backend/deploy/helm/console/</code>. It is
+                intentionally minimal — patch it for your platform (NetworkPolicy, ServiceMonitor,
+                secret backend).
+              </p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code>helm install pgbelaycrew ./modules/backend/deploy/helm/console \
+  --namespace pgbelaycrew --create-namespace \
+  --set image.tag=&lt;version&gt; \
+  --set existingSecret=pgbelaycrew-console \
+  --set oidc.issuer=https://idp.example.com \
+  --set oidc.clientId=pgbelaycrew-console \
+  --set oidc.redirectUrl=https://pgbelaycrew.example.com/api/v1/auth/callback</code></pre>
+              </div>
+              <p>
+                Create the referenced secret before installing — it must contain
+                <code>DATABASE_URL</code>, <code>PGBC_SESSION_SECRET</code>,
+                <code>PGBC_OIDC_CLIENT_SECRET</code>. Add <code>PGBC_BOOTSTRAP_ADMIN_EMAIL</code> to
+                your patched values. <strong>Do not</strong> include a <code>PGBC_MASTER_KEY</code>.
+                The console exposes <code>8080</code> (HTTP), <code>9090</code> (gRPC — must be
+                reachable from every PG host), and <code>9091</code> (Prometheus).
+              </p>
+            </section>
+
+            <section class="doc-section" id="install-ui">
+              <h2>2 · UI install</h2>
+              <p class="doc-lede">
+                The UI is a SvelteKit application served as a Node container. It speaks to the console
+                over HTTP at the <strong>same origin</strong>: production deployments put both behind
+                one reverse proxy so cookies, CSRF, and CSP work without cross-origin gymnastics.
+              </p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">docker-compose.yml</span></div>
+                <pre><code>services:
+  ui:
+    image: ghcr.io/pgbelaycrew/ui:&lt;tag&gt;
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+    ports:
+      - "127.0.0.1:3000:3000"</code></pre>
+              </div>
+              <p>Reverse-proxy rules (HAProxy / nginx / Traefik / Ingress) — UI is the default backend, console wins for these prefixes:</p>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead><tr><th>Path prefix</th><th>Backend</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>/api/</code>, <code>/api/v1/healthz</code>, <code>/pki/</code></td><td>console:8080</td></tr>
+                    <tr><td>everything else</td><td>ui:3000</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="doc-section" id="install-agent">
+              <h2>3 · Agent install</h2>
+              <p class="doc-lede">
+                One agent per PostgreSQL host. Distributed as a native OS package (preferred) or a
+                container. The native package is preferred because the agent needs read access to
+                <code>PGDATA</code>, peer auth to PostgreSQL via the Unix socket, the ability to run
+                <code>wal-g</code> against host paths, and <code>systemd</code> restart-on-crash —
+                all awkward inside a container.
+              </p>
+
+              <h3>Option A — OS package (recommended)</h3>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead><tr><th>Format</th><th>Distros</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>.deb</code></td><td>Debian, Ubuntu</td></tr>
+                    <tr><td><code>.rpm</code></td><td>RHEL, Fedora, CentOS Stream, Rocky, Alma, openSUSE</td></tr>
+                    <tr><td><code>.apk</code></td><td>Alpine</td></tr>
+                    <tr><td><code>.pkg.tar.zst</code></td><td>Arch</td></tr>
+                    <tr><td><code>.tar.gz</code></td><td>anything else (manual install)</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>Each format ships in <strong>amd64</strong> and <strong>arm64</strong>.</p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code><span class="cmt"># Debian / Ubuntu</span>
+sudo apt install ./pgbelaycrew-agent_&lt;ver&gt;_amd64.deb
+<span class="cmt"># RHEL / Fedora / Rocky</span>
+sudo dnf install ./pgbelaycrew-agent-&lt;ver&gt;-1.x86_64.rpm
+<span class="cmt"># Alpine</span>
+sudo apk add --allow-untrusted ./pgbelaycrew-agent_&lt;ver&gt;_amd64.apk
+<span class="cmt"># Arch</span>
+sudo pacman -U ./pgbelaycrew-agent-&lt;ver&gt;-1-x86_64.pkg.tar.zst
+<span class="cmt"># Generic tarball</span>
+sudo tar -C /usr/local/bin -xzf pgbelaycrew-agent_&lt;ver&gt;_linux_amd64.tar.gz</code></pre>
+              </div>
+              <p>
+                The post-install creates the <code>pgbelaycrew</code> system user (member of
+                <code>postgres</code>), provisions <code>/etc/pgbelaycrew</code>,
+                <code>/var/lib/pgbelaycrew</code>, <code>/var/log/pgbelaycrew</code>, copies
+                <code>agent.toml.example</code> to <code>agent.toml</code> if no config exists, and
+                registers the systemd unit.
+              </p>
+              <p><strong>Provision the observer role on every PostgreSQL instance the agent will manage:</strong></p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code>sudo -u postgres psql -f /usr/share/pgbelaycrew/observer-role.sql</code></pre>
+              </div>
+              <p>
+                This creates <code>pgbelaycrew_observer</code> — a least-privilege role for discovery
+                and health checks. Edit <code>/etc/pgbelaycrew/agent.toml</code>, then enroll and start:
+              </p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code><span class="cmt"># Mint a one-shot enrollment token in the console UI</span>
+<span class="cmt"># (Settings → Agents → Enroll a new agent), then on the PG host:</span>
+sudo -u pgbelaycrew pgbelaycrew-agent enroll \
+    --token &lt;one-shot-token&gt; \
+    --console https://pgbelaycrew.example.com
+
+sudo systemctl enable --now pgbelaycrew-agent
+sudo systemctl status pgbelaycrew-agent
+journalctl -u pgbelaycrew-agent -f</code></pre>
+              </div>
+              <p>
+                The enrollment token is <strong>single-use</strong>. It carries the console URL and a
+                fingerprint of the console CA, so the agent can validate the certificate it gets back.
+                After enrollment the agent stores the issued client cert under
+                <code>/etc/pgbelaycrew/agent.crt</code> (key under <code>agent.key</code>).
+              </p>
+
+              <h3>Option B — Container</h3>
+              <p>
+                Use this only if the agent's host requirements (<code>PGDATA</code>, sockets,
+                <code>wal-g</code> binary) are already mounted into the container — typically only
+                inside the validation harness.
+              </p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code>docker run -d \
+  --name pgbelaycrew-agent \
+  --network=host \
+  -v /var/lib/postgresql:/var/lib/postgresql:ro \
+  -v /var/run/postgresql:/var/run/postgresql \
+  -v /etc/pgbelaycrew:/etc/pgbelaycrew \
+  -v /var/lib/pgbelaycrew:/var/lib/pgbelaycrew \
+  ghcr.io/pgbelaycrew/agent:&lt;tag&gt;</code></pre>
+              </div>
+
+              <h3>Verify the agent reached the console</h3>
+              <p>
+                In the UI, <strong>Settings → Agents</strong> lists the agent as <code>online</code>
+                within ~10 seconds of <code>systemctl start</code>. If it stays <code>unenrolled</code>
+                or <code>offline</code>, see <a href="#trouble">Troubleshooting</a> — the common causes
+                are clock skew, CA mismatch, and firewalls blocking the gRPC port.
+              </p>
+            </section>
+
+            <section class="doc-section" id="install-checklist">
+              <h2>4 · Post-install checklist</h2>
+              <p class="doc-lede">Once console + UI + at least one agent are running:</p>
+              <ul>
+                <li>You can sign into the UI via your real OIDC provider — not via Dex.</li>
+                <li><strong>Settings → Agents</strong> shows every enrolled agent as <code>online</code>.</li>
+                <li><strong>Settings → Storage backends</strong> has at least one S3 bucket declared and probed (Object Lock + versioning verified).</li>
+                <li>Each managed cluster has its agent attached and discovery reports green health.</li>
+                <li><code>curl https://pgbelaycrew.example.com/api/v1/healthz</code> returns <code>200</code>.</li>
+                <li>Prometheus is scraping <code>/metrics</code> on the console (<code>:9091</code>) and on every agent (<code>127.0.0.1:9234</code>).</li>
+              </ul>
+              <div class="doc-next">
+                <a class="doc-next-card" href="#configure">
+                  <div class="nlabel">Next</div>
+                  <div class="ntitle">Configure → OIDC, RBAC, retention</div>
+                </a>
+                <a class="doc-next-card" href="#guide">
+                  <div class="nlabel">Then</div>
+                  <div class="ntitle">User guide → the operator's day</div>
+                </a>
+              </div>
+            </section>
+
+            <!-- ===================================================== -->
+            <!-- 02 · CONFIGURE -->
+            <!-- ===================================================== -->
+            <section class="doc-section" id="configure">
+              <span class="doc-section-kicker">02 · Configure guide</span>
+              <h2>Configuring each component</h2>
+              <p class="doc-lede">
+                Two surfaces: the <strong>console</strong> (environment variables, process restart to
+                apply) and the <strong>agent</strong> (a TOML file at
+                <code>/etc/pgbelaycrew/agent.toml</code>, hot-reloaded on <code>SIGHUP</code>).
+              </p>
+              <p>A few things that look like configuration are deliberately <strong>not</strong> in either — they live in the UI, persisted in the console state DB, scoped per cluster:</p>
+              <ul>
+                <li><strong>Storage backends</strong> (S3 buckets, credentials, retention) — encrypted at rest under the sealed master key, rotatable without redeploy.</li>
+                <li><strong>Backup schedules</strong> and <strong>verification cron</strong> — per cluster.</li>
+                <li><strong>OIDC ↔ role mapping</strong> beyond client/secret — claims-to-role rules.</li>
+                <li><strong>Compliance framework toggles.</strong></li>
+                <li><strong>Master key (sealed)</strong> — generated on first boot, wrapped under an operator-supplied unseal password. Not an env var.</li>
+              </ul>
+              <div class="doc-note">
+                <span class="doc-note-label">By design</span>
+                <p>
+                  Configuration operators routinely change should not require a deploy. Configuration
+                  that affects the security boundary (the master-key seal, OIDC trust, mTLS PKI) does.
+                </p>
+              </div>
+            </section>
+
+            <section class="doc-section" id="configure-console">
+              <h2>Console configuration</h2>
+
+              <h3>Mandatory in production</h3>
+              <p>
+                Set <code>PGBC_ENV=production</code> and the console refuses to start without these.
+                Defaults that work in dev are dangerous in prod — that is intentional.
+              </p>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Variable</th><th>Why it matters</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>PGBC_ENV=production</code></td><td>Activates the strict checks below and disables dev-only defaults.</td></tr>
+                    <tr><td><code>DATABASE_URL</code></td><td>Connection string to the console state DB. Use <code>sslmode=require</code> / <code>verify-full</code> when the DB is on a separate host; <code>sslmode=disable</code> is acceptable only on a shared private docker network.</td></tr>
+                    <tr><td><code>PGBC_SESSION_SECRET</code></td><td>HMAC key for cookie sessions. ≥ 32 random bytes. Rotate ⇒ all sessions invalidated.</td></tr>
+                    <tr><td><code>PGBC_OIDC_ISSUER</code></td><td>Your IdP's issuer URL. The console fetches <code>&lt;issuer&gt;/.well-known/openid-configuration</code>.</td></tr>
+                    <tr><td><code>PGBC_OIDC_CLIENT_ID</code></td><td>OAuth2 client registered in your IdP.</td></tr>
+                    <tr><td><code>PGBC_OIDC_CLIENT_SECRET</code></td><td>Confidential client secret.</td></tr>
+                    <tr><td><code>PGBC_OIDC_REDIRECT_URL</code></td><td><code>https://&lt;host&gt;/api/v1/auth/callback</code>. Must match your IdP client registration.</td></tr>
+                    <tr><td><code>PGBC_OIDC_MFA_REQUIRED</code></td><td>Optional. Defaults to <code>true</code> in production. Set <code>false</code> when MFA is enforced upstream but the IdP doesn't surface an MFA-asserted <code>acr</code>/<code>amr</code> claim.</td></tr>
+                    <tr><td><code>PGBC_UI_BASE_URL</code></td><td>The user-facing URL. Used in emails, redirects, and as the default for <code>PGBC_AGENT_ENROLL_URL</code>.</td></tr>
+                    <tr><td><code>PGBC_BOOTSTRAP_ADMIN_EMAIL</code></td><td>Email of the first operator who becomes global <strong>admin</strong> — only if it matches a verified address. Fail-closed: unset means no auto-promotion. Set before first login; unset afterwards.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="doc-note">
+                <span class="doc-note-label">Console → managed-PG credentials</span>
+                <p>
+                  For paths where the console connects directly to a managed PostgreSQL host it builds
+                  a management DSN from <code>PGBC_PG_SUPERUSER</code> (default <code>postgres</code>),
+                  <code>PGBC_PG_SUPERUSER_PASSWORD</code>, and <code>PGBC_PG_SSLMODE</code>. In
+                  production the password <strong>must</strong> be non-default and
+                  <code>sslmode=disable</code> is refused.
+                </p>
+              </div>
+
+              <h3>OIDC discovery on a split network</h3>
+              <p>
+                When the issuer URL browsers see is <strong>not</strong> reachable from the console
+                (split-horizon DNS, an IdP behind an internal hostname, Dex-in-Docker), point
+                discovery at the in-network address and keep accepting tokens minted for the public
+                issuer:
+              </p>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Variable</th><th>Default</th><th>When to set</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>PGBC_OIDC_DISCOVERY_URL</code></td><td>empty ⇒ same as issuer</td><td>The in-network URL the console fetches discovery + JWKS from, while tokens still carry <code>iss == PGBC_OIDC_ISSUER</code>.</td></tr>
+                    <tr><td><code>PGBC_OIDC_SPLIT_HOST_ALLOWLIST</code></td><td>empty</td><td>Required when discovery differs from the issuer. CSV of <code>issuer=discoveryURL</code> pairs allowed to be rewritten. Without a match the console <strong>refuses to start</strong>.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Network listeners</h3>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Variable</th><th>Default</th><th>Notes</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>PGBC_HTTP_ADDR</code></td><td><code>:8080</code></td><td>REST + SSE for the UI. Fronted by your reverse proxy.</td></tr>
+                    <tr><td><code>PGBC_GRPC_ADDR</code></td><td><code>:9090</code></td><td>mTLS gRPC for agents. <strong>Do not</strong> put it behind a layer-7 proxy that breaks long-lived streams.</td></tr>
+                    <tr><td><code>PGBC_METRICS_ADDR</code></td><td><code>:9091</code></td><td>Prometheus <code>/metrics</code>. Loopback or internal-only.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Behavior knobs (defaults are usually fine)</h3>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Variable</th><th>Default</th><th>Effect</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>PGBC_STRICT_OPENAPI</code></td><td><code>false</code></td><td>When <code>true</code>, any route not declared in <code>openapi/v1.yaml</code> returns 404. Prefer <code>true</code> in prod.</td></tr>
+                    <tr><td><code>PGBC_IDEMPOTENCY_TTL</code></td><td><code>24h</code></td><td>How long the console remembers <code>Idempotency-Key</code> headers.</td></tr>
+                    <tr><td><code>PGBC_HEARTBEAT_TTL</code></td><td><code>30s</code></td><td>After this without a heartbeat, an agent is marked <code>offline</code>.</td></tr>
+                    <tr><td><code>PGBC_LOG_LEVEL</code></td><td><code>info</code></td><td><code>debug</code> is verbose. Logs are JSON.</td></tr>
+                    <tr><td><code>PGBC_STORAGE_PROBE_ALLOW_PRIVATE</code></td><td><code>false</code></td><td>Opts the storage prober out of the SSRF guard for private/loopback endpoints. Leave <code>false</code> unless you've confirmed the endpoint is real storage, not a metadata pivot.</td></tr>
+                    <tr><td><code>PGBC_SIMULATE_VERIFY</code></td><td><code>false</code></td><td>Dev only. When <code>false</code> (prod default) verification runs do not fabricate success — they end in the honest <code>simulated</code> state.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Retention horizons</h3>
+              <p>
+                A daily worker prunes the unbounded time-series tables. Defaults match a 1-year
+                compliance horizon; HIPAA and similar require 6+ years — bump
+                <code>PGBC_AUDIT_RETENTION_DAYS</code> accordingly.
+              </p>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead><tr><th>Variable</th><th>Default (days)</th><th>Table</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>PGBC_AUDIT_RETENTION_DAYS</code></td><td>365</td><td><code>audit_log</code> (hash-chained — pruned from the head).</td></tr>
+                    <tr><td><code>PGBC_RESTORE_LOGS_RETENTION_DAYS</code></td><td>365</td><td><code>restore_logs</code></td></tr>
+                    <tr><td><code>PGBC_EVENT_LOG_RETENTION_DAYS</code></td><td>365</td><td><code>event_log</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Minimal production env file</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">pgbelaycrew.env</span></div>
+                <pre><code>PGBC_ENV=production
+DATABASE_URL=postgres://pgbc@console-pg:5432/pgbelaycrew?sslmode=verify-full
+
+PGBC_SESSION_SECRET=&lt;32+ random bytes from a secret manager&gt;
+<span class="cmt"># No PGBC_MASTER_KEY — set the unseal password through the SealOverlay.</span>
+
+PGBC_OIDC_ISSUER=https://idp.example.com
+PGBC_OIDC_CLIENT_ID=pgbelaycrew-console
+PGBC_OIDC_CLIENT_SECRET=&lt;from secret manager&gt;
+PGBC_OIDC_REDIRECT_URL=https://pgbelaycrew.example.com/api/v1/auth/callback
+
+PGBC_UI_BASE_URL=https://pgbelaycrew.example.com
+PGBC_BOOTSTRAP_ADMIN_EMAIL=ops-lead@example.com
+
+PGBC_STRICT_OPENAPI=true
+PGBC_LOG_LEVEL=info</code></pre>
+              </div>
+            </section>
+
+            <section class="doc-section" id="configure-masterkey">
+              <h2>Master key (sealed)</h2>
+              <p class="doc-lede">
+                The console no longer accepts a master key from env. On first boot the seal manager
+                reports <code>state=uninitialized</code>; on every subsequent boot
+                <code>state=sealed</code>, refusing encrypted-data routes
+                (<code>503 + X-Pgbc-Sealed: true</code>) until the operator submits the unseal password.
+              </p>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Step</th><th>When</th><th>What happens</th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>Init</strong></td><td>Once, very first boot</td><td>Operator chooses a password (twice). Backend generates a 32-byte master key, wraps it under an Argon2id-derived KEK, inserts <code>master_keys</code> v1. State → <code>unsealed</code>. CA + gRPC plane start.</td></tr>
+                    <tr><td><strong>Unseal</strong></td><td>After every restart</td><td>Operator types the existing password. Backend unwraps every non-purged row into memory. State → <code>unsealed</code>.</td></tr>
+                    <tr><td><strong>Rotate</strong></td><td>Quarterly / suspected leak</td><td>A second admin approves. New key generated; old version stays decryptable until the background re-encryption walk completes, then retired.</td></tr>
+                    <tr><td><strong>Revoke</strong></td><td>Key compromise</td><td>Same shape as Rotate, but the old version is forensically purged after re-encryption — <code>wrapped_key</code> overwritten, status <code>purged</code>.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="doc-note danger">
+                <span class="doc-note-label">Operational consequences</span>
+                <p>
+                  A console restart leaves the system <strong>temporarily unusable</strong> until an
+                  admin unseals it — plan unattended restarts with your on-call rotation. There is
+                  <strong>no recovery if the password is lost</strong>. The unseal password lives only
+                  in operator memory + the running backend process; KMS-backed unsealing is not wired
+                  in this release.
+                </p>
+              </div>
+            </section>
+
+            <section class="doc-section" id="configure-ui">
+              <h2>UI configuration</h2>
+              <p class="doc-lede">The UI container is intentionally near-zero-config. Two environment variables matter:</p>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead><tr><th>Variable</th><th>Default</th><th>Purpose</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>PORT</code></td><td><code>3000</code></td><td>Node listener. Reverse proxy points here.</td></tr>
+                    <tr><td><code>HOST</code></td><td><code>0.0.0.0</code></td><td>Bind address.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                The UI reaches the console via <strong>same-origin relative paths</strong>
+                (<code>/api/...</code>), so there is no UI-side "API URL" to configure. Two build-time
+                flags (<code>VITE_MOCK_AUTH</code>, <code>VITE_USE_MOCK</code>) exist for development;
+                <strong>production images are built with both set to <code>0</code></strong> — the prod
+                gate refuses to build otherwise.
+              </p>
+            </section>
+
+            <section class="doc-section" id="configure-agent">
+              <h2>Agent configuration</h2>
+              <p class="doc-lede">
+                Single TOML file: <code>/etc/pgbelaycrew/agent.toml</code>, created from
+                <code>agent.toml.example</code> by the package post-install. Hot-reloaded on
+                <code>SIGHUP</code>.
+              </p>
+
+              <h3>Service user (auto-detected at install)</h3>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Condition at install</th><th>Runtime user</th><th>Notes</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>getent passwd postgres</code> succeeds</td><td><code>postgres</code></td><td><code>pg_ctl</code>, <code>wal-g backup-fetch</code>, and PGDATA writes run natively — no sudo shim.</td></tr>
+                    <tr><td>otherwise</td><td><code>pgbelaycrew</code></td><td>Dedicated low-privilege user (with <code>postgres</code> secondary); smaller blast radius.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3><code>[console]</code> — how the agent reaches the control plane</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">agent.toml</span></div>
+                <pre><code>[console]
+url        = "https://pgbelaycrew.example.com"
+cert_path  = "/etc/pgbelaycrew/agent.crt"     <span class="cmt"># written by `agent enroll`</span>
+key_path   = "/etc/pgbelaycrew/agent.key"
+ca_path    = "/etc/pgbelaycrew/console-ca.pem"
+heartbeat_interval     = "10s"
+reconnect_max_backoff  = "60s"
+subject_cn = "pgbelaycrew.example.com"</code></pre>
+              </div>
+              <p>
+                <code>url</code>, <code>ca_path</code>, and <code>subject_cn</code> are populated by
+                <code>pgbelaycrew-agent enroll</code> — re-enroll rather than editing them by hand.
+                <code>heartbeat_interval</code> should be ≤ half of the console's
+                <code>PGBC_HEARTBEAT_TTL</code>.
+              </p>
+
+              <h3><code>[postgres]</code> — how the agent reaches its local PG</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">agent.toml</span></div>
+                <pre><code>[postgres]
+socket_dir          = "/var/run/postgresql"
+observer_role       = "pgbelaycrew_observer"   <span class="cmt"># provisioned by observer-role.sql</span>
+stats_interval      = "30s"
+discovery_interval  = "5m"
+discovery_cache_ttl = "4m"</code></pre>
+              </div>
+              <p>
+                Default is <strong>peer auth via Unix socket</strong> as the least-privilege observer
+                role — no password, no DSN. The role can read configuration views, run
+                <code>pg_stat_*</code> queries, and create restore points; it cannot read user data
+                tables.
+              </p>
+
+              <h3><code>[walg]</code>, <code>[storage]</code>, <code>[sandbox]</code></h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">agent.toml</span></div>
+                <pre><code>[walg]
+binary_path = "/usr/local/bin/wal-g"
+config_file = "/etc/pgbelaycrew/walg.json"     <span class="cmt"># generated from the UI storage backend</span>
+[walg.env]
+WALG_COMPRESSION_METHOD = "zstd"
+WALG_UPLOAD_CONCURRENCY = "8"
+
+[storage]
+disk_temp_path          = "/var/lib/pgbelaycrew/tmp"
+backup_space_multiplier = 4.0                  <span class="cmt"># refuses if &lt;DB size&gt; × N not free</span>
+
+[sandbox]
+host_driver_enabled = false   <span class="cmt"># true → run as a postgres process instead of Docker</span>
+docker_socket       = "/var/run/docker.sock"
+work_dir            = "/var/lib/pgbelaycrew/sandbox"
+hard_ttl            = "4h"    <span class="cmt"># hard cap: older sandboxes are reaped</span>
+gc_interval         = "5m"</code></pre>
+              </div>
+              <p>
+                The agent does not bundle wal-g — install the version your team is on (check
+                <code>pgbelaycrew-agent diag</code>). <code>backup_space_multiplier</code> is the
+                safety factor applied before starting a backup.
+              </p>
+
+              <h3><code>[drift]</code> — config-advisor enforcement</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">agent.toml</span></div>
+                <pre><code>[drift]
+mode = "report-only"   <span class="cmt"># report-only | pause-on-drift | enforce</span></code></pre>
+              </div>
+              <ul>
+                <li><code>report-only</code> — log + report drift in the UI, take no action. Default.</li>
+                <li><code>pause-on-drift</code> — pause scheduled backups for that cluster until drift is resolved or waivered.</li>
+                <li><code>enforce</code> — re-apply the desired value via <code>ALTER SYSTEM</code>. Only on clusters where pgBelayCrew is the canonical source of truth.</li>
+              </ul>
+
+              <h3>Validate before starting</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code>sudo -u pgbelaycrew pgbelaycrew-agent config check            <span class="cmt"># parse + lint</span>
+sudo -u pgbelaycrew pgbelaycrew-agent config print --redact   <span class="cmt"># resolved values</span>
+sudo -u pgbelaycrew pgbelaycrew-agent diag                    <span class="cmt"># environment check</span>
+sudo -u pgbelaycrew pgbelaycrew-agent doctor                  <span class="cmt"># propose fixes</span>
+
+<span class="cmt"># After editing agent.toml, hot-reload without dropping the gRPC stream:</span>
+sudo systemctl reload pgbelaycrew-agent</code></pre>
+              </div>
+            </section>
+
+            <!-- ===================================================== -->
+            <!-- 03 · USER GUIDE -->
+            <!-- ===================================================== -->
+            <section class="doc-section" id="guide">
+              <span class="doc-section-kicker">03 · User guide</span>
+              <h2>The operator's day</h2>
+              <p class="doc-lede">
+                For <strong>DevOps / SRE operators</strong> running a fleet of PostgreSQL clusters.
+                This guide is organized around the four primitives the UI is built on, plus the
+                surrounding facilities (verifications, the advisor, audit, compliance).
+              </p>
+
+              <h3>How the UI is organized</h3>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Area</th><th>What you do here</th></tr></thead>
+                  <tbody>
+                    <tr><td><strong>Clusters</strong></td><td>The map of every PostgreSQL deployment under management. Health, advisor findings, RPO/RTO, recent activity.</td></tr>
+                    <tr><td><strong>Backups</strong></td><td>Schedules, on-demand runs, live progress, retention.</td></tr>
+                    <tr><td><strong>Restore points &amp; runs</strong></td><td>Anchored states + the four restore intents (sandbox / recover-data / restore-cluster / emergency).</td></tr>
+                    <tr><td><strong>Verifications</strong></td><td>L1 → L4 pipelines, evidence, attestations.</td></tr>
+                    <tr><td><strong>Compliance &amp; audit</strong></td><td>33 controls × 5 frameworks, signed audit log, on-demand bundles.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h4>Roles map to permissions</h4>
+              <div class="role-grid">
+                <div class="role-card"><div class="role-name">viewer</div><p>Read everything, change nothing.</p></div>
+                <div class="role-card"><div class="role-name">operator</div><p>Declare clusters, run backups, take restore points, kick off sandbox / recover-data / drill restores.</p></div>
+                <div class="role-card"><div class="role-name">admin</div><p>Manage agents, storage backends, OIDC mapping, retention, RBAC. Approves destructive restores.</p></div>
+                <div class="role-card"><div class="role-name">auditor</div><p>Like viewer, plus exports compliance bundles and the signed audit log.</p></div>
+              </div>
+              <div class="doc-note warn">
+                <span class="doc-note-label">Separation of duty</span>
+                <p>
+                  Destructive actions (real takeover, emergency, cluster delete, backup delete,
+                  PKI/master-key rotation) all follow one path: <strong>a single second-person
+                  approval</strong>. The requester can never approve their own request, so a granted
+                  approval always represents two distinct humans. A human-readable reason lands in the
+                  audit log. <strong>There is no "force" flag.</strong>
+                </p>
+              </div>
+            </section>
+
+            <section class="doc-section" id="guide-cluster">
+              <h2>1 · Cluster — registering and watching a PG deployment</h2>
+              <p class="doc-lede">
+                A <strong>cluster</strong> is a PostgreSQL deployment (single node, or
+                primary&nbsp;+&nbsp;standbys) discovered via an enrolled agent.
+              </p>
+
+              <h3>Enroll the agent first, then declare the cluster</h3>
+              <ol>
+                <li><strong>Settings → Agents → Enroll a new agent.</strong> Generates a single-use enrollment token. Copy it — it is shown once.</li>
+                <li>On the PG host, <code>pgbelaycrew-agent enroll --token &lt;…&gt;</code>.</li>
+                <li>Refresh <strong>Settings → Agents</strong>. The agent shows up as <code>online</code>.</li>
+                <li><strong>Clusters → Declare cluster.</strong> Pick the agent, give the cluster a name + a tag set, attach a storage backend.</li>
+              </ol>
+              <p>
+                Tag clusters with what matters operationally — environment (<code>prod</code>,
+                <code>staging</code>), criticality (<code>tier-1</code>), data class (<code>pii</code>,
+                <code>phi</code>). Schedules and verifications can target by tag.
+              </p>
+
+              <h3>What the cluster page tells you</h3>
+              <ul>
+                <li><strong>Health</strong> — is the agent talking? Is PG up? Is the WAL archive flowing?</li>
+                <li><strong>Advisor findings</strong> — 15 rules. Each has a severity, an impact statement, and the exact <code>ALTER SYSTEM</code> to fix it. Common early ones: <code>archive_mode=off</code>, <code>full_page_writes=off</code>, missing <code>%p</code> in <code>archive_command</code>, <code>data_checksums=off</code>, recent archiver failures.</li>
+                <li><strong>RPO / RTO</strong> — measured numbers, not configured ones. RPO is the wall-clock distance between now and the last archived WAL; RTO is the time of the most recent successful restore drill.</li>
+                <li><strong>Recent activity</strong> — backups, verifications, restore points, restore runs.</li>
+              </ul>
+              <div class="doc-note warn">
+                <span class="doc-note-label">Before scheduling backups</span>
+                <p>
+                  Walk every advisor finding. Fix or <strong>waiver</strong>. A waiver is an explicit,
+                  signed acknowledgment that you accept the risk; it shows up in the audit log and on
+                  the compliance page until removed. <strong>Do not</strong> ship a waiver without
+                  writing the <em>why</em>.
+                </p>
+              </div>
+            </section>
+
+            <section class="doc-section" id="guide-backup">
+              <h2>2 · Backup — scheduling and running</h2>
+              <p class="doc-lede">
+                A <strong>backup</strong> is a wal-g full or delta run against a cluster. The agent
+                does the I/O; the console schedules and tracks.
+              </p>
+
+              <h3>Set the schedule</h3>
+              <p><strong>Cluster → Backups → Schedule.</strong> Pick:</p>
+              <ul>
+                <li><strong>Cadence</strong> — typically a daily full + 15-minute deltas. Cron syntax.</li>
+                <li><strong>Retention</strong> — how many fulls to keep (and the deltas they anchor). Enforced server-side.</li>
+                <li><strong>Window</strong> — optional time-of-day fence, useful when peak load is intolerant.</li>
+              </ul>
+              <p>
+                Retention is <strong>append-mostly</strong>: the policy decides what's deletable, but
+                everything until then is immutable. With Object Lock enabled (recommended), even the
+                console can't undo retention before its expiry.
+              </p>
+
+              <h3>On-demand backup</h3>
+              <p>
+                <strong>Cluster → Backups → Run now.</strong> Live progress streams over Server-Sent
+                Events — bytes uploaded, files archived, ETA. If the console crashes mid-run, the job
+                resumes: backups are durable <code>river</code> jobs, not detached goroutines.
+              </p>
+
+              <h3>What "succeeded" actually means</h3>
+              <ul>
+                <li>The wal-g run returned 0.</li>
+                <li>The console fetched the manifest and recorded real archive sizes (not what wal-g announced).</li>
+              </ul>
+              <p>
+                If either is missing, the backup is <code>partial</code> and counts as a failure for
+                the SLO. A full backup additionally <strong>auto-enqueues an L2 verification</strong>
+                when the cluster marks L2 as auto-after-full — tracked separately, and it does not
+                retroactively flip the backup's own status.
+              </p>
+            </section>
+
+            <section class="doc-section" id="guide-restore-point">
+              <h2>3 · Restore point — naming a moment you can restore to</h2>
+              <p class="doc-lede">
+                A <strong>restore point</strong> is a named anchor: an
+                <code>INSERT INTO pg_create_restore_point(name)</code> recorded as a row, optionally
+                with a fresh full backup and a verification run. Take it <strong>before</strong> a
+                risky deploy, a schema migration, a contentious data fix.
+              </p>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Mode</th><th>What it does</th><th>When to use</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="mode-tag mode-light">light</span></td><td>Marker only</td><td>The deploy is reversible by code; you just want a clean PITR target.</td></tr>
+                    <tr><td><span class="mode-tag mode-enough">enough</span></td><td>Marker + delta backup</td><td>The deploy touches data; a delta is cheap insurance.</td></tr>
+                    <tr><td><span class="mode-tag mode-safe">safe</span></td><td>Marker + full backup</td><td>Schema migration, ETL run — anything where "delta + WAL replay" is not a path you want under pressure.</td></tr>
+                    <tr><td><span class="mode-tag mode-paranoid">paranoid</span></td><td>Marker + full + L2 verification</td><td>Pre-production cutover, irreversible migration. The verification proves the freshly-anchored backup actually restores.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                Take it from <strong>Cluster → Restore points → New</strong>. Reason is mandatory and
+                goes in the audit log. PostgreSQL gives you <code>pg_create_restore_point(...)</code>;
+                pgBelayCrew adds the operational shell around it — the marker is recorded server-side,
+                surfaced in the UI, attached to the anchoring backup, and (in
+                <span class="mode-tag mode-paranoid">paranoid</span> mode) tested before you walk away.
+              </p>
+            </section>
+
+            <section class="doc-section" id="guide-restore">
+              <h2>4 · Restore — the four intents</h2>
+              <p class="doc-lede">
+                Restoring is the stressful path. The wizard collapses every option into one of four
+                intents, named for what the operator actually wants.
+              </p>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Intent</th><th>Outcome</th><th>Approval</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>sandbox</code></td><td>Stand up a side cluster (Docker or host driver), restore into it, leave it browsable. Source untouched.</td><td>None — read-only side effect.</td></tr>
+                    <tr><td><code>recover-data</code></td><td>Selective copy-back of specific tables/schemas from a sandbox into the source.</td><td>None — reversible copy-back.</td></tr>
+                    <tr><td><code>restore-cluster</code></td><td>Drill (non-prod target) <strong>or</strong> real takeover (production).</td><td>Single second-person approval for prod; none for drill.</td></tr>
+                    <tr><td><code>emergency</code></td><td>Fast takeover for true incidents.</td><td>Single second-person approval. <strong>Logged loudly.</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Sandbox — the answer 90% of the time</h3>
+              <p>Your default for "I need to look at the data as of yesterday at 14:00":</p>
+              <ol>
+                <li><strong>Cluster → Restore → Sandbox.</strong> Pick the target time (or a named restore point). The wizard shows the source backups it will use and the WAL range it will replay.</li>
+                <li><strong>Dry-run.</strong> The wizard prints the command sequence and the disk reservation. No commit yet.</li>
+                <li><strong>Confirm.</strong> A sandbox container (or host process) comes up restored. The UI gives you a connection string scoped to that sandbox.</li>
+                <li>Browse, query, run consistency checks. When done, <strong>Reap</strong> — the sandbox is destroyed; the only artifact is the run record.</li>
+              </ol>
+              <p>Sandboxes have a <code>hard_ttl</code> (default 4h) and are reaped automatically.</p>
+
+              <h4>Upgrade test — restore into a newer major version</h4>
+              <p>
+                A <code>sandbox</code> restore with a <strong>target PG version</strong> set becomes an
+                <em>upgrade test</em>: the wizard restores the backup, then loads it into a newer
+                PostgreSQL major version and checks extension parity. Pick the method —
+                <code>dump-restore</code> (default) or <code>pg_upgrade</code> (in-place). A successful
+                upgrade test in the last 365 days satisfies the two upgrade-rehearsal compliance
+                controls (SOC&nbsp;2&nbsp;CC8.1, ISO&nbsp;A.12.3.1). Map each major version's
+                <code>bin</code> directory under <code>[restore.upgrade.bin_dirs]</code> in
+                <code>agent.toml</code>.
+              </p>
+
+              <h3>Recover-data — copy a few tables back</h3>
+              <ol>
+                <li>Take a sandbox to the moment-before. Confirm the data you want.</li>
+                <li><strong>Restore → Recover data.</strong> Pick tables / schemas. The wizard runs <code>pg_dump</code> from sandbox → <code>pg_restore</code> into source under a transaction.</li>
+                <li>One operator approves. Audit log records exactly which rows came from where.</li>
+              </ol>
+              <p>This is conservative: it is a copy, not a rewrite. Conflicts (PK collisions) are reported, not silently overwritten.</p>
+
+              <h3>Restore-cluster — drill or real takeover</h3>
+              <ul>
+                <li><strong>Drill</strong> (target = non-prod cluster) — runs end-to-end, measures real RTO, records the result in the cluster's drill history. Run this on a schedule. <strong>The first time someone restores should not be during the incident.</strong></li>
+                <li><strong>Real takeover</strong> (target = the production cluster itself) — promotes a restored sandbox into the production data path. Requires a single second-person approval. Refuses if anyone is mid-write to the source unless you explicitly fence first.</li>
+              </ul>
+
+              <h3>Emergency — the expedited path</h3>
+              <p>
+                Reserved for true incidents. Like every destructive action it needs <strong>one</strong>
+                approval from a second person — separation of duty is never bypassed — but it skips the
+                review window and other ceremony. The audit log records <em>who</em>, <em>when</em>,
+                <em>what was bypassed</em>, and <em>what reason was given</em>, and the whole org is
+                notified by webhook + email. If you use this more than once a quarter, the policy needs
+                revisiting.
+              </p>
+            </section>
+
+            <section class="doc-section" id="guide-verifications">
+              <h2>5 · Verifications — proving backups actually restore</h2>
+              <p class="doc-lede">
+                Backups that are never restored are a liability. The verification ladder runs on a
+                schedule (or auto-triggered after every full), produces a signed attestation, and emits
+                the result.
+              </p>
+              <div class="doc-note warn">
+                <span class="doc-note-label">Release status</span>
+                <p>
+                  In this release the verification pipeline ships in <strong>simulation mode by
+                  default</strong>. A run does not fabricate a pass or sign an attestation — it reaches
+                  an honest <code>simulated</code> terminal state (with the live → terminal + RTO flow
+                  intact) until the real agent-driven pipeline is enabled (<code>PGBC_SIMULATE_VERIFY</code>,
+                  off in production). Treat the levels below as the target behavior.
+                </p>
+              </div>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Level</th><th>What it does</th><th>Cost</th><th>Frequency</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="lvl-tag lvl-1">L1</span></td><td>basebackup checksum</td><td>seconds</td><td>Every backup, inline</td></tr>
+                    <tr><td><span class="lvl-tag lvl-2">L2</span></td><td>full sandbox restore + assertions</td><td>minutes</td><td>Daily / per-full</td></tr>
+                    <tr><td><span class="lvl-tag lvl-3">L3</span></td><td>regression suite against the restored sandbox</td><td>minutes–hours</td><td>Weekly</td></tr>
+                    <tr><td><span class="lvl-tag lvl-4">L4</span></td><td>multi-cluster (cross-site replay)</td><td>hours</td><td>Monthly / quarterly</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>Configure <strong>per cluster, per level</strong> in <strong>Cluster → Verifications</strong>. Two mutually-exclusive modes:</p>
+              <ul>
+                <li><strong>Cron</strong> — fixed cadence. Predictable, decoupled from backup timing.</li>
+                <li><strong>Auto-after-full</strong> — runs immediately after every scheduled full backup. Higher signal, costs more compute.</li>
+              </ul>
+              <p>
+                Each run produces a pass/fail with an evidence pointer, a <strong>signed
+                attestation</strong> (cosign signature over the run record), and an audit-log entry. A
+                failed verification does <strong>not</strong> automatically pause backups — it raises an
+                alert. Combine with <code>[drift].mode = pause-on-drift</code> for autonomous safety.
+              </p>
+            </section>
+
+            <section class="doc-section" id="guide-advisor">
+              <h2>6 · Configuration advisor — fix what wal-g can't</h2>
+              <p class="doc-lede">
+                The advisor evaluates 15 rules against the live PG configuration. Each finding includes
+                a <strong>severity</strong> (<code>critical</code> / <code>warning</code> /
+                <code>info</code>), an <strong>impact</strong>, the exact <strong>fix</strong>
+                (<code>ALTER SYSTEM</code>, an <code>initdb</code> flag, or a restart note), and a
+                <strong>citation</strong> from the PostgreSQL or wal-g docs.
+              </p>
+              <p>
+                You can <strong>apply</strong> a fix in two clicks (the advisor runs the SQL via the
+                agent, dual-approving if <code>superuser</code> is implied), <strong>dry-run</strong> it,
+                or <strong>waiver</strong> it. Drift detection re-runs the advisor every few minutes; if
+                a value changes outside the advisor's flow, the cluster shows a <code>drift</code> badge
+                until you re-apply, accept, or waiver. Behavior is governed by <code>[drift].mode</code>
+                in <code>agent.toml</code>.
+              </p>
+            </section>
+
+            <section class="doc-section" id="guide-audit">
+              <h2>7 · Audit log</h2>
+              <p class="doc-lede">
+                Every action — login, backup trigger, restore approval, configuration change, waiver,
+                agent enrollment, role change — appends to a hash-chained log. Each entry contains the
+                previous entry's hash; tampering with any row breaks the chain and the next verification
+                fails.
+              </p>
+              <ul>
+                <li><strong>Browse and filter</strong> — by user, action, cluster, time range.</li>
+                <li><strong>Verify the chain</strong> on demand — produces a pass/fail with the bad row, if any.</li>
+                <li><strong>Export a signed bundle</strong> — the audit chain + attestations + storage probes + control evaluations. This is what auditors download.</li>
+              </ul>
+              <div class="doc-note danger">
+                <span class="doc-note-label">No DELETE</span>
+                <p>
+                  There is <strong>no DELETE</strong> on the audit log. State changes; rows don't
+                  disappear. Same applies to attestations, configuration history, restore runs, and
+                  verifications. If you ever need to "purge" something for legal reasons, that's a topic
+                  for the on-call legal contact, not a button in the UI.
+                </p>
+              </div>
+            </section>
+
+            <section class="doc-section" id="guide-compliance">
+              <h2>8 · Compliance — controls evaluated by real queries</h2>
+              <p class="doc-lede">
+                33 controls across SOC&nbsp;2, ISO/IEC&nbsp;27001, HIPAA, GDPR, PCI&nbsp;DSS. Every one
+                is a real SQL query against state pgBelayCrew owns — no mocked statuses, at most one DB
+                query stale.
+              </p>
+              <ul>
+                <li><em>"Backups exist and are recent"</em> → backups table, last_success per cluster.</li>
+                <li><em>"Restores have been tested"</em> → drill history, last_drill within the policy window.</li>
+                <li><em>"Storage is immutable"</em> → Object Lock probe on the bucket registry.</li>
+                <li><em>"Audit log is intact"</em> → live hash-chain verification.</li>
+                <li><em>"Privileged actions require approval"</em> → restore_runs joined with approvals.</li>
+                <li><em>"Backups load into a newer PG major version"</em> → the two upgrade-rehearsal controls pass when a successful upgrade-test restore ran in the last 365 days.</li>
+              </ul>
+              <p>
+                The compliance page is a <strong>per-cluster matrix</strong> — a control can pass for
+                cluster A and fail for cluster B. Filter by framework, by cluster tag, by status. For
+                findings you can't fix immediately, the <strong>gap register</strong> records a waiver
+                with an owner and a deadline; waivers expire and re-open as findings. The
+                <strong>90-day trend</strong> is the chart auditors actually look at.
+              </p>
+
+              <h3>Producing a bundle for an auditor</h3>
+              <p>
+                <strong>Compliance → Export bundle.</strong> Pick the frameworks, clusters, time range.
+                The console produces a signed <code>.zip</code> containing the control matrix at export
+                time, the evidence rows behind each control, the signed audit-log slice for the period,
+                and a signature over the whole bundle. Auditors verify the signature; the bundle stands
+                on its own.
+              </p>
+            </section>
+
+            <section class="doc-section" id="guide-rhythm">
+              <h2>9 · Day-to-day rhythm</h2>
+              <p class="doc-lede">A reasonable weekly operator cadence, once the fleet is set up:</p>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead><tr><th>Cadence</th><th>Action</th></tr></thead>
+                  <tbody>
+                    <tr><td>Daily</td><td>Skim the <strong>Clusters</strong> dashboard, triage any red. Check backup success for the prior 24h.</td></tr>
+                    <tr><td>Weekly</td><td>Walk advisor findings — clear or waiver each. Review the verification results.</td></tr>
+                    <tr><td>Weekly</td><td>Run a sandbox restore on one randomly-picked cluster. Real RTO; real confidence.</td></tr>
+                    <tr><td>Monthly</td><td>Drill a full <code>restore-cluster</code> on staging. Note the RTO; chart it.</td></tr>
+                    <tr><td>Quarterly</td><td>Export a compliance bundle, even if no audit is pending. Forces you to look at gaps.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>What you should <em>not</em> be doing weekly: restarting agents (they hot-reload), hand-editing <code>agent.toml</code> on each host (declare once, push via config management), or computing RPO/RTO manually for the audit (the console computes them; the export contains them).</p>
+            </section>
+
+            <!-- ===================================================== -->
+            <!-- 04 · TROUBLESHOOTING -->
+            <!-- ===================================================== -->
+            <section class="doc-section" id="trouble">
+              <span class="doc-section-kicker">04 · Troubleshooting</span>
+              <h2>1 · Agent stays <code>unenrolled</code> or <code>offline</code></h2>
+              <p class="doc-lede">
+                Operator-facing failure modes, organized by <em>symptom</em> — start at the section
+                that matches what you're seeing. Many "broken" symptoms are really first-install
+                mistakes; if you're still bringing the system up, re-check
+                <a href="#install">Install</a> and <a href="#configure">Configure</a> first.
+              </p>
+
+              <h3>Step 1 — confirm what the agent thinks</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">PG host</span></div>
+                <pre><code>sudo systemctl status pgbelaycrew-agent
+sudo journalctl -u pgbelaycrew-agent -n 200 --no-pager
+sudo -u pgbelaycrew pgbelaycrew-agent diag
+sudo -u pgbelaycrew pgbelaycrew-agent config print --redact</code></pre>
+              </div>
+              <p>Read the journal <strong>before</strong> restarting anything — restarts hide the original error.</p>
+
+              <h3>Step 2 — match the symptom</h3>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Journal symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>enrollment token expired</code> / <code>token already used</code></td><td>One-shot tokens. Ran <code>enroll</code> twice, or waited too long.</td><td>Mint a fresh token (Settings → Agents → Enroll), re-run <code>enroll</code>.</td></tr>
+                    <tr><td><code>x509: certificate signed by unknown authority</code></td><td>The agent does not trust the console's server cert.</td><td>Re-fetch the console CA. Token enrollment carries the CA fingerprint; for a manual <code>console-ca.pem</code>, replace it with what the console presents.</td></tr>
+                    <tr><td><code>x509: certificate has expired or is not yet valid</code></td><td>Clock skew.</td><td>Fix NTP. ±5 minutes is the practical tolerance.</td></tr>
+                    <tr><td><code>connection refused</code> / <code>i/o timeout</code> to gRPC</td><td>The console's <code>:9090</code> is not reachable from this host.</td><td>Open the firewall. Don't put a layer-7 proxy in front; gRPC streams are long-lived.</td></tr>
+                    <tr><td><code>tls: handshake failure</code> after enroll</td><td>Wrong CA presented client-side, or the console rejects the cert.</td><td><code>openssl x509 -in agent.crt -noout -text</code>; check Subject + Issuer. If revoked, re-enroll.</td></tr>
+                    <tr><td><code>permission denied</code> reading <code>agent.key</code></td><td>File mode changed away from <code>0640 pgbelaycrew:pgbelaycrew</code>.</td><td><code>chown pgbelaycrew:pgbelaycrew agent.{crt,key}; chmod 0640 agent.key</code>.</td></tr>
+                    <tr><td>Heartbeats arrive but agent shows <code>offline</code></td><td><code>heartbeat_interval</code> larger than <code>PGBC_HEARTBEAT_TTL</code>.</td><td>Keep the 10s vs 30s ratio.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Step 3 — when nothing matches</h3>
+              <p>Cleanly re-enroll. Non-destructive — the agent's local state DB is preserved:</p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">PG host</span></div>
+                <pre><code>sudo systemctl stop pgbelaycrew-agent
+sudo -u pgbelaycrew pgbelaycrew-agent unenroll --keep-logs
+<span class="cmt"># Mint a new one-shot token in the UI.</span>
+sudo -u pgbelaycrew pgbelaycrew-agent enroll --token &lt;new&gt; --console https://pgbelaycrew.example.com
+sudo systemctl start pgbelaycrew-agent</code></pre>
+              </div>
+            </section>
+
+            <section class="doc-section" id="trouble-cert">
+              <h2>2 · Agent cert revoked or expired</h2>
+              <h3>If revoked from the console</h3>
+              <p>The agent's cert is on the revocation list; the console refuses the next handshake. The agent keeps retrying with backoff. Procedure:</p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">PG host</span></div>
+                <pre><code>sudo systemctl stop pgbelaycrew-agent
+sudo rm /etc/pgbelaycrew/agent.crt /etc/pgbelaycrew/agent.key
+<span class="cmt"># Mint a fresh token in the UI for this agent.</span>
+sudo -u pgbelaycrew pgbelaycrew-agent enroll --token &lt;new&gt; --console https://pgbelaycrew.example.com
+sudo systemctl start pgbelaycrew-agent</code></pre>
+              </div>
+              <p>
+                The cluster the agent was attached to <strong>stays attached</strong> — cluster identity
+                is server-side, not bound to the cert. The audit log records "agent re-enrolled".
+              </p>
+              <h3>Console server cert expired</h3>
+              <p>
+                The console mints its own serving cert from the internal CA and re-mints it at 2/3 of
+                lifetime, so this should not happen. If it does, the renewal loop has likely been
+                silenced by a recurring CA error — resolve the underlying issue and the next tick issues
+                a new cert. Forced workaround: restart the console process to mint a fresh cert at startup.
+              </p>
+            </section>
+
+            <section class="doc-section" id="trouble-backup">
+              <h2>3 · Backups failing or <code>partial</code></h2>
+              <h3>"succeeded but <code>partial</code>"</h3>
+              <p>The wal-g run returned 0 but a post-condition failed (manifest fetch, real-size accounting, or inline L1 verification). Look at the wal-g log:</p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">PG host</span></div>
+                <pre><code>ls -la /var/log/pgbelaycrew/walg/
+sudo -u pgbelaycrew tail -200 /var/log/pgbelaycrew/walg/&lt;latest&gt;.log</code></pre>
+              </div>
+              <ul>
+                <li><strong>Inline L1 checksum mismatch</strong> — corruption in the freshly-uploaded basebackup. Re-run; if it persists, suspect storage or RAM.</li>
+                <li><strong>Manifest fetch failed</strong> — the bucket allowed PUT but is denying GET. Check IAM policy.</li>
+              </ul>
+              <h3>"failed: insufficient disk space"</h3>
+              <p>
+                <code>[storage].backup_space_multiplier</code> (default <code>4.0</code>) refused to
+                start because <code>&lt;DB size&gt; × 4</code> is not free on
+                <code>disk_temp_path</code>. Free space (the right answer), or lower the multiplier only
+                if you know your compression actually achieves it.
+              </p>
+              <h3>"archive_command failed"</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">PG host</span></div>
+                <pre><code>sudo -u postgres psql -c "SELECT * FROM pg_stat_archiver;"</code></pre>
+              </div>
+              <p>
+                <code>failed_count &gt; 0</code> with a recent <code>last_failed_time</code> — most often
+                bucket credentials rotated without refreshing the wal-g config (re-declare the storage
+                backend in the UI), or the <code>pgbelaycrew</code> user lost group access to PGDATA.
+              </p>
+            </section>
+
+            <section class="doc-section" id="trouble-restore">
+              <h2>4 · Restore won't proceed</h2>
+              <h3>"approval required, but I am the only operator"</h3>
+              <p>
+                Production <code>restore-cluster</code>, <code>emergency</code>, and cluster-delete each
+                require one approval from a <em>second</em> person — the requester can never approve
+                their own request. <strong>There is no force flag.</strong> Approve as a second user
+                (the right answer for any path); <code>emergency</code> still needs that approval but
+                skips the review window and logs loudly. If you routinely hit this in non-emergency,
+                your org has a process problem (single SRE on call), not a tool problem.
+              </p>
+              <h3>"sandbox failed to start"</h3>
+              <ul>
+                <li><strong>Docker driver</strong> — <code>docker_socket</code> not accessible to the agent user. The post-install adds <code>pgbelaycrew</code> to <code>postgres</code>, not <code>docker</code>. Either <code>gpasswd -a pgbelaycrew docker</code> or switch to the host driver.</li>
+                <li><strong>Host driver</strong> — needs a <code>postgres</code> binary on PATH and writable <code>[sandbox].work_dir</code>. <code>diag</code> reports both.</li>
+              </ul>
+              <h3>"sandbox reaped while I was using it"</h3>
+              <p>
+                <code>[sandbox].hard_ttl</code> (default 4h) is a hard cap. Raise it in
+                <code>agent.toml</code> <em>before</em> you start the sandbox; reloading mid-sandbox
+                doesn't extend the existing TTL.
+              </p>
+            </section>
+
+            <section class="doc-section" id="trouble-db">
+              <h2>5 · Console DB is down</h2>
+              <p class="doc-lede">The console fails to start, or returns 500 with <code>database connection failed</code>.</p>
+              <h3>If the console is misconfigured</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">console env</span></div>
+                <pre><code>echo "$DATABASE_URL"                  <span class="cmt"># right host? right sslmode?</span>
+psql "$DATABASE_URL" -c "select 1;"   <span class="cmt"># does it actually connect?</span></code></pre>
+              </div>
+              <p>
+                Most outages are configuration: rotated DB password, expired DB cert in
+                <code>verify-full</code>, or a pgBouncer that doesn't support the wire features the
+                console uses. <strong>Don't</strong> point the console at a pgBouncer
+                <code>transaction</code> pool — it uses <code>LISTEN/NOTIFY</code> and prepared
+                statements that need a session pool.
+              </p>
+              <h3>If the DB is genuinely down</h3>
+              <ul>
+                <li><strong>Agents keep working.</strong> Local SQLite state continues cron-driven backups. You lose live progress; the agent reports them when the console returns.</li>
+                <li><strong>In-flight restore jobs</strong> (durable river jobs) resume when the console returns.</li>
+                <li><strong>The audit chain is paused</strong> — it doesn't fork or break, it just doesn't grow.</li>
+              </ul>
+              <p>
+                If the DB host is permanently lost, restore a recent dump (the state DB is <em>not</em>
+                backed up by pgBelayCrew — back it up like your other Postgres), point
+                <code>DATABASE_URL</code> at the new host, start the console. Agents reconnect, cluster
+                identities are preserved, the audit chain continues.
+              </p>
+            </section>
+
+            <section class="doc-section" id="trouble-masterkey">
+              <h2>6 · Master key — sealed lifecycle</h2>
+              <h3>Console boots stuck on <code>503 + X-Pgbc-Sealed: true</code></h3>
+              <p>
+                The system is <code>sealed</code>. Sign in, the SealOverlay paints automatically, type
+                the password. The CA + agent gRPC plane come up the moment unseal succeeds — no restart
+                needed. If the overlay never appears, check <code>/api/v1/seal/status</code>; if it
+                reports <code>state=sealed</code> but you don't see the modal, hard-refresh the tab.
+              </p>
+              <div class="doc-note danger">
+                <span class="doc-note-label">Forgotten unseal password</span>
+                <p>
+                  <strong>There is no recovery.</strong> The Argon2id KEK is a one-way derivation; every
+                  wrapped blob is unreachable without the password, and restoring the DB doesn't help.
+                  If genuinely lost: wipe <code>master_keys</code> (or restore a pre-encryption dump),
+                  re-init with a new password, <strong>re-declare every storage backend</strong>, and
+                  <strong>re-enroll every agent</strong> (the internal CA private key was lost with the
+                  master key).
+                </p>
+              </div>
+              <h3>Suspected compromise (Revoke) vs routine rotation</h3>
+              <p>
+                Use <strong>Revoke</strong> when the password <em>and</em> the DB dump leaked: rotate
+                every storage credential at the provider first, pull the new credentials in, then
+                <strong>Settings → Security → Revoke</strong> (a second admin approves), supply the new
+                master password, and the background job re-encrypts every blob under a fresh key and
+                forensically purges the old version. <strong>Rotate</strong> is the same flow at lower
+                urgency (previous version <code>retired</code>, not <code>purged</code>) — quarterly is
+                reasonable, and the migration is online.
+              </p>
+            </section>
+
+            <section class="doc-section" id="trouble-walg">
+              <h2>7 · wal-g version mismatch</h2>
+              <p class="doc-lede">
+                <code>diag</code> warns <code>wal-g version not in supported matrix</code>, or backups
+                fail on flags wal-g doesn't recognize, or old archives can't be read. The agent does
+                not bundle wal-g — your distribution does.
+              </p>
+              <ul>
+                <li><strong>Older than the matrix lower bound</strong> — backups may not be restorable by a current agent, and missing CLI flags break new features. Upgrade.</li>
+                <li><strong>Newer than the upper bound</strong> — usually fine for backup, but new archive formats may not be readable downstream. Check release notes.</li>
+              </ul>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">PG host</span></div>
+                <pre><code><span class="cmt"># Pause the schedule (UI) or wait for an idle window.</span>
+sudo systemctl stop pgbelaycrew-agent
+<span class="cmt"># Install the new wal-g at [walg].binary_path (default /usr/local/bin/wal-g).</span>
+sudo systemctl start pgbelaycrew-agent
+sudo -u pgbelaycrew pgbelaycrew-agent diag    <span class="cmt"># confirm matrix-OK</span></code></pre>
+              </div>
+              <p>A failed in-place upgrade does not corrupt existing archives — the archive format is wal-g's, not the agent's.</p>
+            </section>
+
+            <section class="doc-section" id="trouble-audit">
+              <h2>8 · Audit log shows <code>chain broken</code></h2>
+              <p class="doc-lede">Every few minutes the console verifies the hash-chained audit log. <code>chain broken</code> is a security event, not a bug.</p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code>curl -s -X POST https://pgbelaycrew.example.com/api/v1/audit/verify | jq</code></pre>
+              </div>
+              <p>The response includes the <strong>first bad row</strong> by ID. From there:</p>
+              <ol>
+                <li>Check who/what last wrote near that row (legit operator action, or an unexpected actor?).</li>
+                <li>Check for direct writes to <code>audit_log</code> outside the console's API. The only legitimate writer is the console process; a DBA running an <code>UPDATE</code> for "cleanup" will break the chain.</li>
+                <li>The chain cannot be "repaired" — that's the point. Record an addendum (a new entry with a <code>chain_repaired_after</code> reference and explanation), but the original break stays visible.</li>
+              </ol>
+              <p>If the break has no explanation, escalate per your incident process. Bring the signed-bundle export from before the break.</p>
+            </section>
+
+            <section class="doc-section" id="trouble-ui">
+              <h2>9 · Common UI symptoms</h2>
+              <div class="doc-table-wrap">
+                <table class="doc-table wrap-first">
+                  <thead><tr><th>Symptom</th><th>Likely cause</th></tr></thead>
+                  <tbody>
+                    <tr><td>Login redirect loop</td><td>OIDC <code>redirect_url</code> mismatch between console env and IdP client. Must match exactly, including trailing slashes and scheme.</td></tr>
+                    <tr><td>"OIDC discovery failed"</td><td><code>PGBC_OIDC_ISSUER</code> URL not reachable from the console pod/container. Network policy, or the IdP runs on a different network.</td></tr>
+                    <tr><td>Settings → Agents empty after enrollment succeeded</td><td>Cookies on the wrong domain. UI and console must share an origin.</td></tr>
+                    <tr><td>Real-time progress doesn't stream</td><td>SSE blocked. Reverse proxy must pass <code>Cache-Control: no-cache</code>, not buffer responses, and have a long idle timeout (≥ 5 min).</td></tr>
+                    <tr><td>Some endpoints return 501</td><td>Expected — endpoints declared in <code>openapi/v1.yaml</code> but not yet implemented return <code>501</code> with an RFC&nbsp;7807 body.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="doc-note">
+                <span class="doc-note-label">When in doubt — what we want in a bug report</span>
+                <p>
+                  <code>pgbelaycrew-agent version</code> + <code>console version</code> (the build
+                  identity), <code>pgbelaycrew-agent diag</code>, the last 30&nbsp;minutes of
+                  <code>journalctl -u pgbelaycrew-agent</code> and <code>docker logs &lt;console&gt;</code>,
+                  the output of <code>/api/v1/healthz</code> — plus the symptom, what you were doing, and
+                  whether you can reproduce it.
+                </p>
+              </div>
+            </section>
+
+            <!-- ===================================================== -->
+            <!-- 05 · BUILD -->
+            <!-- ===================================================== -->
+            <section class="doc-section" id="build">
+              <span class="doc-section-kicker">05 · Build guide</span>
+              <h2>Producing the artifacts you install</h2>
+              <p class="doc-lede">
+                For whoever builds the release: <strong>agent OS packages</strong> and
+                <strong>container images</strong> for console / UI / agent. Both are driven from the
+                project-root <code>Makefile</code>. If you only want to install a release someone else
+                built, go to <a href="#install">Install</a> instead.
+              </p>
+
+              <h3>Why two artifact types</h3>
+              <ul>
+                <li><strong>OS packages</strong> install the agent on the <strong>PostgreSQL host itself</strong>, with a real systemd unit, a real <code>pgbelaycrew</code> user in the <code>postgres</code> group, peer auth via Unix socket, and direct filesystem reach to <code>PGDATA</code>. Five formats so it installs cleanly on every Linux distro.</li>
+                <li><strong>Container image</strong> of the agent exists primarily for the validation harness — same code, packaged for a Docker network.</li>
+              </ul>
+              <p>The console and UI are container-only. Everything builds for <strong>amd64 and arm64</strong> — multi-arch is not optional.</p>
+
+              <h3>Versioning</h3>
+              <p>Every module's <code>VERSION</code> file holds the same string, in the form <code>YY.MM.&lt;short-sha&gt;</code>:</p>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code>$ make version
+VERSION=26.05.2ce6d86
+COMMIT=2ce6d86
+BUILD_DATE=2026-05-08T19:10:00Z
+REGISTRY=ghcr.io/pgbelaycrew
+TAG=26.05.2ce6d86
+PLATFORMS=linux/amd64,linux/arm64</code></pre>
+              </div>
+              <p>The three modules are kept in lockstep — the gRPC contract evolves together. <code>make bump-version</code> writes the same <code>YY.MM.&lt;sha&gt;</code> into every module before tagging a release.</p>
+            </section>
+
+            <section class="doc-section" id="build-packages">
+              <h2>Agent packages — what <code>make packages</code> produces</h2>
+              <p class="doc-lede">Five formats × two arches = 10 artifacts in <code>modules/agent/dist/</code>.</p>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead><tr><th>Target</th><th>Output</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>make packages-deb</code></td><td><code>pgbelaycrew-agent_&lt;ver&gt;_{amd64,arm64}.deb</code></td></tr>
+                    <tr><td><code>make packages-rpm</code></td><td><code>pgbelaycrew-agent-&lt;ver&gt;-1.{x86_64,aarch64}.rpm</code></td></tr>
+                    <tr><td><code>make packages-apk</code></td><td><code>pgbelaycrew-agent_&lt;ver&gt;_{amd64,arm64}.apk</code></td></tr>
+                    <tr><td><code>make packages-archlinux</code></td><td><code>...-1-{x86_64,aarch64}.pkg.tar.zst</code></td></tr>
+                    <tr><td><code>make packages-tgz</code></td><td><code>..._linux_{amd64,arm64}.tar.gz</code></td></tr>
+                    <tr><td><code>make packages</code></td><td>All of the above</td></tr>
+                    <tr><td><code>make packages-bundle*</code></td><td>Same formats with <strong><code>wal-g</code> bundled in</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                By default the package does <strong>not</strong> ship <code>wal-g</code> — operators
+                install the version their team is on. Under the hood
+                <code>modules/agent/packaging/build-deb.sh</code> runs Go cross-compilation in a
+                <code>golang:1.24-bookworm</code> container, then hands the binary to
+                <code>goreleaser/nfpm</code>. Use <code>--no-docker</code> if you have Go and
+                <code>nfpm</code> locally.
+              </p>
+            </section>
+
+            <section class="doc-section" id="build-images">
+              <h2>Container images — what <code>make images</code> produces</h2>
+              <p class="doc-lede">Four images, each with two tags (<code>&lt;TAG&gt;</code> and <code>latest</code>).</p>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead><tr><th>Target</th><th>Image</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>make image-backend</code></td><td><code>&lt;REGISTRY&gt;/console:&lt;TAG&gt;</code></td></tr>
+                    <tr><td><code>make image-ui</code></td><td><code>&lt;REGISTRY&gt;/ui:&lt;TAG&gt;</code></td></tr>
+                    <tr><td><code>make image-agent</code></td><td><code>&lt;REGISTRY&gt;/agent:&lt;TAG&gt;</code></td></tr>
+                    <tr><td><code>make image-migrate</code></td><td><code>&lt;REGISTRY&gt;/pgbc-console-migrate:&lt;TAG&gt;</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>Each Dockerfile is multi-stage and small:</p>
+              <ul>
+                <li><strong>console</strong> — <code>golang:1.25-alpine</code> → distroless. <code>EXPOSE 8080 9090 9091</code>.</li>
+                <li><strong>ui</strong> — <code>node:20-alpine</code> runs <code>npm run build:prod</code> (strict mock gate) → <code>node:20-alpine</code> runtime. Runs as <code>node</code>, not root.</li>
+                <li><strong>agent</strong> — builder → <strong><code>ubuntu:24.04</code></strong> (not distroless: bundled <code>wal-g</code> is built against glibc). Bundles <code>wal-g</code>; <code>EXPOSE 9234</code>.</li>
+                <li><strong>console-migrate</strong> — tiny one-shot: <code>goose</code> + <code>river</code> + migrations on <code>alpine</code>.</li>
+              </ul>
+              <h3>Single-arch (host) vs multi-arch (push)</h3>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code><span class="cmt"># Development build, single-arch, local</span>
+make images
+<span class="cmt"># Release build, multi-arch, pushed to registry</span>
+make images-push REGISTRY=ghcr.io/myorg TAG=v1.2.3
+<span class="cmt"># Override the platform list</span>
+make image-backend-push PLATFORMS=linux/amd64</code></pre>
+              </div>
+              <p>You need <code>docker login &lt;registry&gt;</code> before <code>*-push</code>. The Makefile will not paper over an unauthenticated push.</p>
+            </section>
+
+            <section class="doc-section" id="build-aggregates">
+              <h2>Aggregates &amp; per-module shortcuts</h2>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
+                <pre><code><span class="cmt"># Local — packages + all images (host arch). End-to-end test on one box.</span>
+make release
+<span class="cmt"># Real release — packages + multi-arch images pushed.</span>
+make release-push REGISTRY=ghcr.io/myorg TAG=v1.2.3</code></pre>
+              </div>
+              <div class="doc-table-wrap">
+                <table class="doc-table">
+                  <thead><tr><th>Target</th><th>What it does</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>make test</code></td><td>Backend + UI + agent unit tests.</td></tr>
+                    <tr><td><code>make ci</code></td><td>Full backend + agent CI (lint, test, vuln-scan, OpenAPI lint, OpenAPI ↔ UI drift).</td></tr>
+                    <tr><td><code>make clean</code></td><td>Remove <code>dist/</code>, <code>bin/</code>, <code>build/</code>, <code>.svelte-kit</code>.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="doc-code">
+                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash · per-module</span></div>
+                <pre><code>make backend-build      <span class="cmt"># modules/backend/bin/console</span>
+make ui-build           <span class="cmt"># production build (strict mock gate)</span>
+make agent-build        <span class="cmt"># host-arch binary at modules/agent/bin/agent</span></code></pre>
+              </div>
+              <p>These call into per-module Makefiles and drive the same logic CI uses — a green local run means a green CI run.</p>
+            </section>
+
+            <section class="doc-section" id="build-repro">
+              <h2>Reproducibility — what is and isn't pinned</h2>
+              <ul>
+                <li><strong>Go toolchain</strong> — pinned to <code>go.mod</code> (<code>golang:1.25-alpine</code> for images, <code>golang:1.24-bookworm</code> for package cross-compilation).</li>
+                <li><strong>Node</strong> — pinned to <code>node:20-alpine</code>.</li>
+                <li><strong><code>nfpm</code></strong> — <code>goreleaser/nfpm:latest</code> (pin for byte-identical builds).</li>
+                <li><strong>Runtime bases</strong> — console distroless; agent <code>ubuntu:24.04</code>; console-migrate <code>alpine</code>. All tags roll; pin to a digest for supply-chain reproducibility.</li>
+                <li><strong><code>wal-g</code> (agent image)</strong> — <code>--build-arg WALG_VERSION=latest</code> resolves at build time. Pin <code>WALG_VERSION</code> (and optionally <code>WALG_SHA256</code>) explicitly.</li>
+                <li><strong><code>COMMIT</code></strong> — embedded from <code>git rev-parse --short HEAD</code>. Build inside a non-git checkout and you get <code>unknown</code>. Don't.</li>
+              </ul>
+              <div class="doc-note warn">
+                <span class="doc-note-label">Common build failures</span>
+                <p>
+                  <strong>buildx not available</strong> → install the <code>docker-buildx</code> plugin.
+                  <strong>Multi-arch image won't load locally</strong> → expected;
+                  <code>buildx build --push</code> can't load a multi-arch manifest, build single-arch
+                  with <code>make image-*</code>. <strong>UI build fails with "mock gate"</strong> →
+                  ensure <code>VITE_USE_MOCK</code> and <code>VITE_MOCK_AUTH</code> are unset/<code>0</code>.
+                  <strong>Registry push 401/403</strong> → <code>docker login</code> first.
+                </p>
+              </div>
+              <div class="doc-next">
+                <a class="doc-next-card" href="#guide">
+                  <div class="nlabel">Operate it</div>
+                  <div class="ntitle">User guide → the operator's day</div>
+                </a>
+                <a class="doc-next-card" href="https://github.com/pgbelaycrew/pgbelaycrew" rel="noopener">
+                  <div class="nlabel">Source</div>
+                  <div class="ntitle">github.com/pgbelaycrew/pgbelaycrew</div>
+                </a>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- FOOTER -->
+    <!-- ============================================================ -->
+    <footer class="footer">
+      <div class="container footer-inner">
+        <span class="brand">
+          <span class="brand-logo" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2 C7 2 4 5 4 11 L4 18 C4 20 6 22 8 22 L16 22 C18 22 20 20 20 18 L20 14"/>
+              <path d="M16 8 L20 8"/>
+            </svg>
+          </span>
+          <span class="brand-name">
+            <span class="brand-pg">pg</span><span class="brand-rest">Belay<span class="crew">Crew</span></span>
+          </span>
+        </span>
+        <span class="footer-meta">© 2026 contributors · AGPL v3 · runs on PostgreSQL</span>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="docs.js"></script>
+  </body>
+</html>
