@@ -247,8 +247,8 @@
               <p>
                 The minimal production-ish topology runs three containers (UI, console,
                 console-state-Postgres) plus your reverse proxy. A ready-to-adapt compose file ships
-                at <code>docker-compose.prod.yml</code> — it wires the five services together (UI,
-                console, console-state-Postgres, one-shot schema migrator, HAProxy), pulls every
+                at <code>docker-compose.prod.yml</code> — it wires the four services together (UI,
+                console, console-state-Postgres, HAProxy), pulls every
                 image from <code>ghcr.io/pgbelaycrew/pgbc-*:stable</code>, terminates TLS at HAProxy
                 with hardened cipher suites and HSTS, and routes <code>/api</code>, <code>/pki</code>
                 to the console while everything else goes to the UI on the same origin.
@@ -292,23 +292,18 @@ docker compose -f docker-compose.prod.yml --env-file pgbelaycrew.env up -d</code
       - "127.0.0.1:9091:9091"   <span class="cmt"># Prometheus metrics</span></code></pre>
               </div>
               <p>
-                Run database migrations <strong>once</strong> before starting the console for the
-                first time. Migrations ship in a dedicated one-shot image
-                (<code>pgbc-console-migrate</code>) that bundles <code>goose</code> (schema) and
-                <code>river</code> (queue) — the console refuses to start against a stale schema.
-                Re-run on every release that ships migrations:
+                Database migrations are applied <strong>automatically</strong>. The console embeds
+                its schema (<code>goose</code>) and queue (<code>river</code>) migrations and runs
+                them in-process at startup, before it serves any traffic — migrations are idempotent
+                and serialized across replicas by a PostgreSQL advisory lock, so starting (or
+                restarting) the console is all that's needed, both on first boot and on every release
+                that ships new migrations. There is no separate migrate image or one-shot step to run.
               </p>
-              <div class="doc-code">
-                <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
-                <pre><code>docker run --rm \
-  -e DATABASE_URL=postgres://pgbc:***@console-pg:5432/pgbelaycrew?sslmode=require \
-  -e GOOSE_DRIVER=postgres \
-  -e GOOSE_DBSTRING=postgres://pgbc:***@console-pg:5432/pgbelaycrew?sslmode=require \
-  -e GOOSE_MIGRATION_DIR=/migrations \
-  --entrypoint /bin/sh \
-  ghcr.io/pgbelaycrew/pgbc-console-migrate:&lt;tag&gt; \
-  -c 'goose up &amp;&amp; river migrate-up --database-url "$DATABASE_URL"'</code></pre>
-              </div>
+              <p>
+                To manage the schema out of band instead (e.g. in a regulated change window), set
+                <code>PGBC_AUTO_MIGRATE=false</code> on the console and apply migrations yourself with
+                <code>goose</code> / <code>river</code> against <code>console-pg</code> before starting it.
+              </p>
               <p>Verify the HTTP plane is up:</p>
               <div class="doc-code">
                 <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
@@ -624,6 +619,7 @@ journalctl -u pgbelaycrew-agent -f</code></pre>
                     <tr><td><code>PGBC_LOG_LEVEL</code></td><td><code>info</code></td><td><code>debug</code> is verbose. Logs are JSON.</td></tr>
                     <tr><td><code>PGBC_STORAGE_PROBE_ALLOW_PRIVATE</code></td><td><code>false</code></td><td>Opts the storage prober out of the SSRF guard for private/loopback endpoints. Leave <code>false</code> unless you've confirmed the endpoint is real storage, not a metadata pivot.</td></tr>
                     <tr><td><code>PGBC_SIMULATE_VERIFY</code></td><td><code>false</code></td><td>Dev only. When <code>false</code> (prod default) verification runs do not fabricate success — they end in the honest <code>simulated</code> state.</td></tr>
+                    <tr><td><code>PGBC_AUTO_MIGRATE</code></td><td><code>true</code></td><td>Apply the embedded schema (<code>goose</code>) and queue (<code>river</code>) migrations in-process at startup, serialized across replicas by a PG advisory lock. Set <code>false</code> to manage the schema out of band.</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1499,7 +1495,7 @@ PLATFORMS=linux/amd64,linux/arm64</code></pre>
 
             <section class="doc-section" id="build-images">
               <h2>Container images — what <code>make images</code> produces</h2>
-              <p class="doc-lede">Four images, each with two tags (<code>&lt;TAG&gt;</code> and <code>latest</code>).</p>
+              <p class="doc-lede">Three images, each with two tags (<code>&lt;TAG&gt;</code> and <code>latest</code>).</p>
               <div class="doc-table-wrap">
                 <table class="doc-table">
                   <thead><tr><th>Target</th><th>Image</th></tr></thead>
@@ -1507,7 +1503,6 @@ PLATFORMS=linux/amd64,linux/arm64</code></pre>
                     <tr><td><code>make image-backend</code></td><td><code>&lt;REGISTRY&gt;/console:&lt;TAG&gt;</code></td></tr>
                     <tr><td><code>make image-ui</code></td><td><code>&lt;REGISTRY&gt;/ui:&lt;TAG&gt;</code></td></tr>
                     <tr><td><code>make image-agent</code></td><td><code>&lt;REGISTRY&gt;/agent:&lt;TAG&gt;</code></td></tr>
-                    <tr><td><code>make image-migrate</code></td><td><code>&lt;REGISTRY&gt;/pgbc-console-migrate:&lt;TAG&gt;</code></td></tr>
                   </tbody>
                 </table>
               </div>
@@ -1516,8 +1511,12 @@ PLATFORMS=linux/amd64,linux/arm64</code></pre>
                 <li><strong>console</strong> — <code>golang:1.25-alpine</code> → distroless. <code>EXPOSE 8080 9090 9091</code>.</li>
                 <li><strong>ui</strong> — <code>node:20-alpine</code> runs <code>npm run build:prod</code> (strict mock gate) → <code>node:20-alpine</code> runtime. Runs as <code>node</code>, not root.</li>
                 <li><strong>agent</strong> — builder → <strong><code>ubuntu:24.04</code></strong> (not distroless: bundled <code>wal-g</code> is built against glibc). Bundles <code>wal-g</code>; <code>EXPOSE 9234</code>.</li>
-                <li><strong>console-migrate</strong> — tiny one-shot: <code>goose</code> + <code>river</code> + migrations on <code>alpine</code>.</li>
               </ul>
+              <p>
+                The schema (<code>goose</code>) and queue (<code>river</code>) migrations are embedded
+                in the <strong>console</strong> image (<code>migrations/embed.go</code>) and applied
+                in-process at startup, so there is no separate migrate image to build or publish.
+              </p>
               <h3>Single-arch (host) vs multi-arch (push)</h3>
               <div class="doc-code">
                 <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
@@ -1565,7 +1564,7 @@ make agent-build        <span class="cmt"># host-arch binary at modules/agent/bi
                 <li><strong>Go toolchain</strong> — pinned to <code>go.mod</code> (<code>golang:1.25-alpine</code> for images, <code>golang:1.24-bookworm</code> for package cross-compilation).</li>
                 <li><strong>Node</strong> — pinned to <code>node:20-alpine</code>.</li>
                 <li><strong><code>nfpm</code></strong> — <code>goreleaser/nfpm:latest</code> (pin for byte-identical builds).</li>
-                <li><strong>Runtime bases</strong> — console distroless; agent <code>ubuntu:24.04</code>; console-migrate <code>alpine</code>. All tags roll; pin to a digest for supply-chain reproducibility.</li>
+                <li><strong>Runtime bases</strong> — console distroless; agent <code>ubuntu:24.04</code>. All tags roll; pin to a digest for supply-chain reproducibility.</li>
                 <li><strong><code>wal-g</code> (agent image)</strong> — <code>--build-arg WALG_VERSION=latest</code> resolves at build time. Pin <code>WALG_VERSION</code> (and optionally <code>WALG_SHA256</code>) explicitly.</li>
                 <li><strong><code>COMMIT</code></strong> — embedded from <code>git rev-parse --short HEAD</code>. Build inside a non-git checkout and you get <code>unknown</code>. Don't.</li>
               </ul>
