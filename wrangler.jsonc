@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "pgbelaycrew-landing",
+  "name": "pgbelaycrew-landing-page",
   "compatibility_date": "2026-06-21",
   "main": "src/index.js",
 
