@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pgbelaycrew-landing",
+  "compatibility_date": "2026-06-21",
+  "main": "src/index.js",
+
+  // Static assets are built into ./dist by build.sh (allowlist — never .git).
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Run the Worker on EVERY request so observability logs every hit.
+    // Without this, file hits are served straight from assets and never
+    // invoke the Worker, so they would not appear in Workers Logs.
+    "run_worker_first": true
+  },
+
+  // Workers Observability: server-side request logs/traces/metrics.
+  // 100% sampling is fine for a marketing/docs site; lower head_sampling_rate
+  // (0..1) if traffic grows. No client-side cookies are set by this.
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

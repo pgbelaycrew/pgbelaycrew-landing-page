@@ -247,11 +247,12 @@
               <p>
                 The minimal production-ish topology runs three containers (UI, console,
                 console-state-Postgres) plus your reverse proxy. A ready-to-adapt compose file ships
-                at <code>docker-compose.prod.yml</code> — it wires the four services together (UI,
-                console, console-state-Postgres, HAProxy), pulls every
+                at <code>docker-compose.prod.yml</code> — it wires the five services together (UI,
+                console, console-state-Postgres, a one-shot schema migrator, HAProxy), pulls every
                 image from <code>ghcr.io/pgbelaycrew/pgbc-*:stable</code>, terminates TLS at HAProxy
                 with hardened cipher suites and HSTS, and routes <code>/api</code>, <code>/pki</code>
-                to the console while everything else goes to the UI on the same origin.
+                to the console while everything else goes to the UI on the same origin. The agent
+                gRPC plane is exposed as a TCP passthrough on <code>:9090</code>.
               </p>
               <div class="doc-code">
                 <div class="doc-code-bar"><span class="dot-rgb r"></span><span class="dot-rgb y"></span><span class="dot-rgb g"></span><span class="lang">bash</span></div>
@@ -571,11 +572,22 @@ journalctl -u pgbelaycrew-agent -f</code></pre>
               <div class="doc-note">
                 <span class="doc-note-label">Console → managed-PG credentials</span>
                 <p>
-                  For paths where the console connects directly to a managed PostgreSQL host it builds
-                  a management DSN from <code>PGBC_PG_SUPERUSER</code> (default <code>postgres</code>),
-                  <code>PGBC_PG_SUPERUSER_PASSWORD</code>, and <code>PGBC_PG_SSLMODE</code>. In
-                  production the password <strong>must</strong> be non-default and
-                  <code>sslmode=disable</code> is refused.
+                  For the remaining paths where the console connects directly to a managed PostgreSQL
+                  host (cluster size collection, post-backup ack probes, restore orchestration) it
+                  builds a management DSN from <code>PGBC_PG_SUPERUSER</code> (default
+                  <code>postgres</code>), <code>PGBC_PG_SUPERUSER_PASSWORD</code> (default
+                  <code>postgres</code>), and <code>PGBC_PG_SSLMODE</code> (default <code>require</code>
+                  in production, <code>disable</code> otherwise). The console does <strong>not</strong>
+                  refuse the defaults in production — whether the well-known password or an unencrypted
+                  link is acceptable on your network is the admin's decision. Set a real password and
+                  <code>require</code> / <code>verify-full</code> whenever the console↔host path crosses
+                  a network you don't fully trust.
+                </p>
+                <p>
+                  The config-advisor audit and WAL-archiving health do <strong>not</strong> use this
+                  DSN: the agent reads <code>pg_settings</code> and <code>pg_stat_archiver</code> over
+                  its local socket and ships them in its ConfigSnapshot / DiscoveryReport frames, so
+                  "run audit" works in production without the console ever dialing the host.
                 </p>
               </div>
 
@@ -618,7 +630,7 @@ journalctl -u pgbelaycrew-agent -f</code></pre>
                     <tr><td><code>PGBC_HEARTBEAT_TTL</code></td><td><code>30s</code></td><td>After this without a heartbeat, an agent is marked <code>offline</code>.</td></tr>
                     <tr><td><code>PGBC_LOG_LEVEL</code></td><td><code>info</code></td><td><code>debug</code> is verbose. Logs are JSON.</td></tr>
                     <tr><td><code>PGBC_STORAGE_PROBE_ALLOW_PRIVATE</code></td><td><code>false</code></td><td>Opts the storage prober out of the SSRF guard for private/loopback endpoints. Leave <code>false</code> unless you've confirmed the endpoint is real storage, not a metadata pivot.</td></tr>
-                    <tr><td><code>PGBC_SIMULATE_VERIFY</code></td><td><code>false</code></td><td>Dev only. When <code>false</code> (prod default) verification runs do not fabricate success — they end in the honest <code>simulated</code> state.</td></tr>
+                    <tr><td><code>PGBC_SIMULATE_VERIFY</code></td><td><code>false</code></td><td>When <code>false</code> (the production default) the <strong>real</strong> pipeline runs: L1 via the cluster's agent, L2/L3 console-driven when <code>PGBC_RESTORE_DOCKER_SOCKET</code> is set (the sandbox-restore overlay). With no docker socket, L2/L3 runs end in the honest <code>simulated</code> state — never a fabricated success, never an attestation. Set <code>true</code> only to exercise the UI flow in dev.</td></tr>
                     <tr><td><code>PGBC_AUTO_MIGRATE</code></td><td><code>true</code></td><td>Apply the embedded schema (<code>goose</code>) and queue (<code>river</code>) migrations in-process at startup, serialized across replicas by a PG advisory lock. Set <code>false</code> to manage the schema out of band.</td></tr>
                   </tbody>
                 </table>
@@ -1045,24 +1057,36 @@ sudo systemctl reload pgbelaycrew-agent</code></pre>
                 schedule (or auto-triggered after every full), produces a signed attestation, and emits
                 the result.
               </p>
-              <div class="doc-note warn">
+              <div class="doc-note">
                 <span class="doc-note-label">Release status</span>
                 <p>
-                  In this release the verification pipeline ships in <strong>simulation mode by
-                  default</strong>. A run does not fabricate a pass or sign an attestation — it reaches
-                  an honest <code>simulated</code> terminal state (with the live → terminal + RTO flow
-                  intact) until the real agent-driven pipeline is enabled (<code>PGBC_SIMULATE_VERIFY</code>,
-                  off in production). Treat the levels below as the target behavior.
+                  The real verification pipeline is <strong>available</strong>. <strong>L1</strong>
+                  dispatches <code>wal-g wal-verify integrity</code> to the cluster's primary agent —
+                  it works on every deployment with an enrolled agent. <strong>L2/L3</strong> run
+                  <strong>console-driven</strong>: a real <code>wal-g backup-fetch</code> of the pinned
+                  backup into a fresh docker sandbox, boot, smoke checks, and (L3) the operator
+                  assertions executed read-only. They require the console docker socket — always
+                  present in the validation harness, <strong>opt-in in production</strong> via the
+                  <code>docker-compose.sandbox-restore.yml</code> overlay. That sandbox boots at the
+                  basebackup checkpoint (<code>pg_resetwal</code>, no WAL replay yet), so the
+                  attestation covers <em>basebackup restorability</em>, not WAL-archive continuity.
+                  <strong>L4</strong> fails honestly until PITR replay lands.
+                </p>
+                <p>
+                  Without docker, a run ends in the honest <code>simulated</code> terminal state — never
+                  a fabricated pass, never an attestation. The dev-only simulator behind
+                  <code>PGBC_SIMULATE_VERIFY</code> fabricates the full flow for UI validation; keep it
+                  <strong>off</strong> in production.
                 </p>
               </div>
               <div class="doc-table-wrap">
                 <table class="doc-table wrap-first">
                   <thead><tr><th>Level</th><th>What it does</th><th>Cost</th><th>Frequency</th></tr></thead>
                   <tbody>
-                    <tr><td><span class="lvl-tag lvl-1">L1</span></td><td>basebackup checksum</td><td>seconds</td><td>Every backup, inline</td></tr>
-                    <tr><td><span class="lvl-tag lvl-2">L2</span></td><td>full sandbox restore + assertions</td><td>minutes</td><td>Daily / per-full</td></tr>
-                    <tr><td><span class="lvl-tag lvl-3">L3</span></td><td>regression suite against the restored sandbox</td><td>minutes–hours</td><td>Weekly</td></tr>
-                    <tr><td><span class="lvl-tag lvl-4">L4</span></td><td>multi-cluster (cross-site replay)</td><td>hours</td><td>Monthly / quarterly</td></tr>
+                    <tr><td><span class="lvl-tag lvl-1">L1</span></td><td>wal-g integrity check on the agent host</td><td>seconds</td><td>Every backup, inline</td></tr>
+                    <tr><td><span class="lvl-tag lvl-2">L2</span></td><td>full sandbox restore + smoke checks</td><td>minutes</td><td>Daily / per-full</td></tr>
+                    <tr><td><span class="lvl-tag lvl-3">L3</span></td><td>L2 + operator assertion suite against the restored sandbox</td><td>minutes–hours</td><td>Weekly</td></tr>
+                    <tr><td><span class="lvl-tag lvl-4">L4</span></td><td>PITR replay to a target time <em>(not yet implemented — fails honestly)</em></td><td>hours</td><td>Monthly / quarterly</td></tr>
                   </tbody>
                 </table>
               </div>

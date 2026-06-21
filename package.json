@@ -1,0 +1,14 @@
+{
+  "name": "pgbelaycrew-landing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "pgBelayCrew landing page — deployed to Cloudflare Workers (static assets).",
+  "scripts": {
+    "build": "bash build.sh",
+    "dev": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}

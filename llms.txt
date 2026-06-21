@@ -13,10 +13,10 @@ The project's positioning is deliberately narrow: it does not replace wal-g, it 
 - Four primitives organize the operator's day: Cluster, Backup, Restore point, Restore run.
 - Restore points come at four paranoia levels: light, enough, safe, paranoid.
 - Restore runs expose four intents: sandbox, recover-data, restore-cluster, emergency. Destructive paths require dual approval.
-- Verifications run at four levels (L1–L4): checksum, sandbox + assertions, regression suite, multi-cluster. Triggered on cron or after every full backup. Each emits a signed attestation.
+- Verifications run at four levels (L1–L4): wal-g integrity check on the agent, sandbox restore + smoke checks, L2 plus an operator assertion suite, and PITR replay (not yet implemented — fails honestly). L1 is agent-driven; L2/L3 are console-driven and opt-in in production. Triggered on cron or after every full backup. Each emits a signed attestation.
 - Configuration advisor with 15 rules sourced from official PostgreSQL and wal-g docs. Each finding includes severity, impact, and the exact `ALTER SYSTEM` to fix it.
 - Hash-chained audit log; every action appended and verifiable, exportable as a signed bundle.
-- Compliance dashboard: 31 controls across SOC 2, ISO/IEC 27001, HIPAA, GDPR, and PCI DSS, evaluated by real DB queries, with a gap register, waiver workflow, 90-day trend, and signed audit bundle.
+- Compliance dashboard: 33 controls across SOC 2, ISO/IEC 27001, HIPAA, GDPR, and PCI DSS, evaluated by real DB queries, with a gap register, waiver workflow, 90-day trend, and signed audit bundle.
 
 ## License and stance
 
