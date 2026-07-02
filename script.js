@@ -257,3 +257,139 @@
     });
   });
 })();
+
+(function () {
+  let modal = null;
+  let input = null;
+  let discoOn = false;
+  let discoEls = [];
+
+  function buildModal() {
+    modal = document.createElement('div');
+    modal.className = 'egg-modal-overlay';
+    modal.innerHTML =
+      '<div class="egg-modal" role="dialog" aria-modal="true" aria-label="Command console">' +
+        '<p class="egg-modal-title">// command console</p>' +
+        '<div class="egg-input-row">' +
+          '<span class="egg-prompt" aria-hidden="true">&gt;</span>' +
+          '<input class="egg-input" type="text" autocomplete="off" spellcheck="false" ' +
+                 'aria-label="Enter command" placeholder="type a command…" />' +
+        '</div>' +
+        '<p class="egg-hint">Restricted Access</p>' +
+      '</div>';
+
+    const box = modal.querySelector('.egg-modal');
+    input = modal.querySelector('.egg-input');
+
+    // Click outside the dialog closes the console.
+    modal.addEventListener('mousedown', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        runCommand(input.value.trim(), box);
+      }
+    });
+
+    document.body.appendChild(modal);
+  }
+
+  function modalOpen() {
+    return modal && modal.style.display !== 'none';
+  }
+
+  function openModal() {
+    if (!modal) buildModal();
+    modal.style.display = 'flex';
+    input.value = '';
+    requestAnimationFrame(() => input.focus());
+  }
+
+  function closeModal() {
+    if (modal) modal.style.display = 'none';
+  }
+
+  function runCommand(raw, box) {
+    const cmd = raw.toUpperCase();
+    if (cmd === 'DISCO') {
+      toggleDisco();
+      closeModal();
+    } else if (cmd === 'STOP' || cmd === 'OFF' || cmd === 'LIGHTS OUT') {
+      stopDisco();
+      closeModal();
+    } else {
+      // Unknown command — shake the box and let them try again.
+      box.classList.remove('egg-shake');
+      void box.offsetWidth; // restart the animation
+      box.classList.add('egg-shake');
+      input.value = '';
+    }
+  }
+
+  function toggleDisco() {
+    if (discoOn) stopDisco();
+    else startDisco();
+  }
+
+  function makeBall(modifier) {
+    const ball = document.createElement('div');
+    ball.className = 'egg-ball ' + modifier;
+    ball.setAttribute('aria-hidden', 'true');
+    ball.innerHTML = '<span class="egg-ball-cap"></span>';
+    return ball;
+  }
+
+  function startDisco() {
+    if (discoOn) return;
+    discoOn = true;
+
+    // Triangular spotlight beams that sweep from the ceiling.
+    const lights = document.createElement('div');
+    lights.className = 'egg-lights';
+    lights.setAttribute('aria-hidden', 'true');
+    lights.innerHTML = '<span class="egg-beam"></span>'.repeat(5);
+    document.body.appendChild(lights);
+    discoEls = [lights];
+
+    // Two mirror balls flanking the hero wordmark (fall back to a single
+    // ball hung from the ceiling if the title isn't on the page).
+    const title = document.querySelector('.hero-title');
+    if (title) {
+      const left = makeBall('egg-ball--left');
+      const right = makeBall('egg-ball--right');
+      title.appendChild(left);
+      title.appendChild(right);
+      discoEls.push(left, right);
+    } else {
+      const solo = makeBall('egg-ball--solo');
+      document.body.appendChild(solo);
+      discoEls.push(solo);
+    }
+
+    document.body.classList.add('egg-disco');
+  }
+
+  function stopDisco() {
+    if (!discoOn) return;
+    discoOn = false;
+    document.body.classList.remove('egg-disco');
+    discoEls.forEach((el) => el.remove());
+    discoEls = [];
+  }
+
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+G opens (or re-closes) the console.
+    if (e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'g' || e.key === 'G')) {
+      e.preventDefault();
+      if (modalOpen()) closeModal();
+      else openModal();
+      return;
+    }
+    if (e.key === 'Escape') {
+      if (modalOpen()) closeModal();
+      else if (discoOn) stopDisco();
+    }
+  });
+})();

@@ -1922,3 +1922,303 @@ code {
   .cta-card { padding: 40px 24px 32px; }
   .card { padding: 24px; }
 }
+
+/* ============================================================
+   Easter egg — the "command console" (Ctrl+G) and DISCO mode. 🪩
+   Everything here is inert until script.js injects the markup /
+   toggles `body.egg-disco`, so it never touches the normal page.
+   ============================================================ */
+
+/* --- Command console modal --- */
+.egg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: egg-fade 160ms var(--transition);
+}
+
+.egg-modal {
+  width: min(440px, 100%);
+  padding: 18px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-default);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-subtle);
+}
+
+.egg-modal-title {
+  margin: 0 0 12px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.egg-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+}
+.egg-input-row:focus-within { border-color: var(--accent); }
+
+.egg-prompt {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.egg-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  caret-color: var(--accent);
+}
+.egg-input::placeholder {
+  color: var(--text-disabled);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.egg-hint {
+  margin: 12px 0 0;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.egg-modal.egg-shake { animation: egg-shake 0.4s var(--transition); }
+
+@keyframes egg-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes egg-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(3px); }
+}
+
+/* --- Disco balls (boules à facettes) flanking the hero title --- */
+/* The two balls are injected as children of .hero-title, which is an
+   inline-flex box centered over its text, so right/left:100% pins them
+   just outside the wordmark. The title itself is kept unfiltered so the
+   silver reads true — the rainbow lives on its inner spans instead. */
+body.egg-disco .hero-title { position: relative; overflow: visible; }
+
+.egg-ball {
+  --size: clamp(58px, 7vw, 84px);
+  --string: 96px;
+  position: absolute;
+  top: 50%;
+  width: var(--size);
+  height: var(--size);
+  margin-top: calc(var(--size) * -0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+  /* facet base + lighting, painted top layer first */
+  background-color: #aebfc9;
+  background-image:
+    /* tight specular hotspot */
+    radial-gradient(circle at 32% 26%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 16%),
+    /* soft key light */
+    radial-gradient(circle at 37% 30%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 46%),
+    /* stray colored reflections a mirror ball throws back */
+    radial-gradient(circle at 74% 64%, rgba(90,170,255,0.30) 0%, rgba(90,170,255,0) 24%),
+    radial-gradient(circle at 58% 82%, rgba(255,110,190,0.26) 0%, rgba(255,110,190,0) 24%),
+    radial-gradient(circle at 24% 68%, rgba(150,255,190,0.22) 0%, rgba(150,255,190,0) 22%),
+    /* vertical tile seams (columns) */
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.34) 0 1px, rgba(255,255,255,0.05) 1px 2px, transparent 2px 8px),
+    /* horizontal tile seams (rows) — a touch stronger, like the real thing */
+    repeating-linear-gradient(0deg,  rgba(0,0,0,0.40) 0 1px, rgba(255,255,255,0.06) 1px 2px, transparent 2px 8px),
+    /* edge vignette for spherical roundness */
+    radial-gradient(circle at 40% 34%, rgba(255,255,255,0) 40%, rgba(0,0,0,0.10) 66%, rgba(0,0,0,0.58) 100%),
+    /* silver body */
+    radial-gradient(circle at 40% 34%, #f2f6f9 0%, #c3cfd8 34%, #93a2ae 66%, #56646f 100%);
+  background-size:
+    100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%,
+    8px 8px, 8px 8px, 100% 100%, 100% 100%;
+  box-shadow:
+    inset -14px -16px 34px rgba(0,0,0,0.55),
+    inset 12px 12px 26px rgba(255,255,255,0.22),
+    0 0 30px 4px rgba(150,190,255,0.45),
+    0 0 70px 14px rgba(180,130,255,0.28);
+  transform-origin: 50% -110%;
+  animation:
+    egg-ball-spin 3.6s linear infinite,
+    egg-ball-sway 5.5s ease-in-out infinite,
+    egg-ball-glow 4.2s ease-in-out infinite;
+}
+
+/* twinkling mirror flashes on top of the facets */
+.egg-ball::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background-image:
+    radial-gradient(circle at 54% 38%, rgba(255,255,255,0.95) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 30% 54%, rgba(190,225,255,0.95) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 68% 60%, rgba(255,205,150,0.95) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 46% 72%, rgba(255,155,205,0.95) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 62% 30%, rgba(160,255,205,0.95) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 40% 44%, rgba(255,255,255,0.9)  0 1.4px, transparent 2.4px);
+  animation: egg-ball-twinkle 1.5s ease-in-out infinite;
+}
+
+/* metal cap + hanging string */
+.egg-ball-cap {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 26%;
+  height: 15%;
+  transform: translateX(-50%);
+  border: 1.5px solid #d7dee4;
+  border-bottom: none;
+  border-radius: 45% 45% 0 0;
+  background: linear-gradient(#f1f5f8, #9dabb6);
+}
+.egg-ball-cap::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 2px;
+  height: var(--string);
+  transform: translateX(-50%);
+  background: linear-gradient(rgba(255,255,255,0), rgba(214,224,232,0.6));
+}
+
+.egg-ball--left  { right: 100%; margin-right: 30px; }
+.egg-ball--right { left: 100%;  margin-left: 30px; }
+/* opposite phase so the pair swings in counterpoint */
+.egg-ball--right { animation-delay: -1.8s, -2.75s, -1.4s; }
+.egg-ball--right::after { animation-delay: -0.7s; }
+
+@keyframes egg-ball-spin {
+  /* only the two facet-seam layers (indexes 6 & 7) travel sideways */
+  from { background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 0 0,   0 0, 50% 50%, 50% 50%; }
+  to   { background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%, 32px 0, 0 0, 50% 50%, 50% 50%; }
+}
+@keyframes egg-ball-sway {
+  0%, 100% { transform: rotate(-3.2deg); }
+  50%      { transform: rotate(3.2deg); }
+}
+@keyframes egg-ball-glow {
+  0%, 100% { box-shadow:
+    inset -14px -16px 34px rgba(0,0,0,0.55),
+    inset 12px 12px 26px rgba(255,255,255,0.22),
+    0 0 30px 4px rgba(150,190,255,0.45),
+    0 0 70px 14px rgba(180,130,255,0.28); }
+  50% { box-shadow:
+    inset -14px -16px 34px rgba(0,0,0,0.55),
+    inset 12px 12px 26px rgba(255,255,255,0.22),
+    0 0 34px 6px rgba(255,130,200,0.5),
+    0 0 80px 18px rgba(130,220,255,0.32); }
+}
+@keyframes egg-ball-twinkle {
+  0%, 100% { opacity: 0.35; filter: hue-rotate(0deg); }
+  50%      { opacity: 1;    filter: hue-rotate(140deg); }
+}
+
+/* Single fallback ball, hung from the ceiling if there's no hero title. */
+.egg-ball--solo {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  margin-top: 0;
+  margin-left: calc(var(--size) * -0.5);
+  z-index: 200;
+}
+
+/* --- Triangular spotlight beams sweeping from the ceiling --- */
+.egg-lights {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.egg-beam {
+  position: absolute;
+  top: -8vh;
+  width: 42vmax;
+  height: 118vh;
+  margin-left: -21vmax;
+  /* narrow at the apex (top), fanning out toward the floor */
+  clip-path: polygon(48% 0, 52% 0, 100% 100%, 0 100%);
+  background: linear-gradient(to bottom, currentColor 0%, rgba(0,0,0,0) 72%);
+  opacity: 0.5;
+  filter: blur(16px);
+  transform-origin: 50% 0;
+  animation:
+    egg-beam-sweep 8s ease-in-out infinite alternate,
+    egg-beam-hue 9s linear infinite;
+}
+.egg-beam:nth-child(1) { left: 16%; color: hsl(200 100% 62%); animation-duration: 8s, 9s;  }
+.egg-beam:nth-child(2) { left: 38%; color: hsl(320 100% 64%); animation-duration: 9.5s, 11s; animation-delay: -2.5s, -3s; }
+.egg-beam:nth-child(3) { left: 50%; color: hsl(50 100% 60%);  animation-duration: 7s, 8s;   animation-delay: -1s, -5s; }
+.egg-beam:nth-child(4) { left: 62%; color: hsl(140 100% 58%); animation-duration: 10s, 12s; animation-delay: -4s, -2s; }
+.egg-beam:nth-child(5) { left: 84%; color: hsl(275 100% 66%); animation-duration: 8.5s, 10s; animation-delay: -6s, -4s; }
+
+@keyframes egg-beam-sweep {
+  0%   { transform: rotate(-26deg); }
+  100% { transform: rotate(26deg); }
+}
+@keyframes egg-beam-hue { to { filter: blur(16px) hue-rotate(360deg); } }
+
+/* --- The page itself dances to the beat --- */
+body.egg-disco main { animation: egg-beat 0.5s ease-in-out infinite alternate; }
+@keyframes egg-beat {
+  from { filter: brightness(1) saturate(1); }
+  to   { filter: brightness(1.14) saturate(1.35); }
+}
+
+/* rainbow every section heading — except the hero title, whose <h1>
+   hosts the balls and must stay unfiltered (its spans rainbow instead) */
+body.egg-disco .heading:not(.hero-title) { animation: egg-hue 7s linear infinite; }
+@keyframes egg-hue { to { filter: hue-rotate(360deg); } }
+
+body.egg-disco .hero-title > span:not(.t-cursor) {
+  display: inline-block;
+  animation: egg-hue 6s linear infinite, egg-title-bounce 0.5s ease-in-out infinite alternate;
+}
+body.egg-disco .hero-title > span:nth-child(2) { animation-delay: 0s, -0.12s; }
+body.egg-disco .hero-title > span:nth-child(3) { animation-delay: 0s, -0.24s; }
+@keyframes egg-title-bounce {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-6px); }
+}
+
+body.egg-disco .card { animation: egg-card-bob 0.5s ease-in-out infinite alternate; }
+body.egg-disco .card:nth-child(2n) { animation-delay: -0.25s; }
+body.egg-disco .card:nth-child(3n) { animation-delay: -0.15s; }
+@keyframes egg-card-bob {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-4px); }
+}
+
+/* Smaller balls / tighter beams on narrow screens */
+@media (max-width: 700px) {
+  .egg-ball { --size: 46px; --string: 60px; }
+  .egg-ball--left  { margin-right: 12px; }
+  .egg-ball--right { margin-left: 12px; }
+}
