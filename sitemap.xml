@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sitemap for https://pgbelaycrew.org
+
+  Only the two real pages are listed. The in-page anchors (#features,
+  #architecture, #guide-audit, ...) are deliberately absent: search engines
+  ignore URL fragments in sitemaps, so listing them adds noise, not coverage.
+
+  <changefreq> and <priority> are also omitted on purpose — Google ignores both.
+  <lastmod> IS used, but only while it stays accurate: bump the date when a
+  page's content actually changes, not on every deploy.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://pgbelaycrew.org/</loc>
+    <lastmod>2026-05-31</lastmod>
+  </url>
+  <url>
+    <!-- /docs, not /docs.html — Workers static assets 307-redirect the .html
+         form to the extensionless one, and a sitemap should list final URLs. -->
+    <loc>https://pgbelaycrew.org/docs</loc>
+    <lastmod>2026-06-21</lastmod>
+  </url>
+</urlset>

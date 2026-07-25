@@ -1,0 +1,12 @@
+# robots.txt for https://pgbelaycrew.org
+#
+# This site is a public landing page plus operator documentation. There is
+# nothing here to withhold from crawlers, so everything is allowed.
+#
+# The Sitemap line is what makes sitemap.xml discoverable without a manual
+# Search Console submission — keep the absolute URL, relative paths are invalid.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://pgbelaycrew.org/sitemap.xml

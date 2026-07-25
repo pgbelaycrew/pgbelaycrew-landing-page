@@ -15,6 +15,8 @@ cp -R \
   script.js \
   docs.js \
   llms.txt \
+  robots.txt \
+  sitemap.xml \
   .nojekyll \
   screens \
   dist/
